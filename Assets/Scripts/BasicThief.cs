@@ -7,7 +7,7 @@ public class BasicThief : MonoBehaviour
     Rigidbody2D rb;
     Vector2 moveVec = Vector2.zero;
 
-    public float wanderCooldown = 1f;
+    public float wanderCooldown = 2.5f;
     float timer;
 
     float lastX = 0;
@@ -42,18 +42,12 @@ public class BasicThief : MonoBehaviour
     // =========================
     void Wander()
     {
-        float x = Random.Range(-0.5f, 0.5f);
-        float y = Random.Range(-0.5f, 0.5f);
+        Vector2 dir = Random.insideUnitCircle.normalized;
 
-        x += lastX;
-        y += lastY;
+        moveVec = Vector2.Lerp(moveVec, dir, 0.5f);
 
-        Vector2 dir = new Vector2(x, y).normalized;
-
-        moveVec = dir;
-
-        lastX = dir.x;
-        lastY = dir.y;
+        lastX = moveVec.x;
+        lastY = moveVec.y;
     }
 
     // =========================
@@ -123,17 +117,18 @@ public class BasicThief : MonoBehaviour
         desired += rb.linearVelocity.normalized * 0.5f;
 
         // avoidance tidak terlalu dominan
-        desired += AvoidWall() * 0.6f;
+        desired += AvoidWall() * 0.3f;
 
-        rb.linearVelocity = Vector2.Lerp(
+        rb.linearVelocity = Vector2.SmoothDamp(
             rb.linearVelocity,
             desired,
+            ref moveVec,
             Time.fixedDeltaTime * 6f
         );
 
         rb.linearVelocity = Vector2.ClampMagnitude(rb.linearVelocity, moveSpeed);
 
-        if (rb.linearVelocity.magnitude < 0.1f)
+        if (rb.linearVelocity.magnitude < 0.2f)
         {
             moveVec = Random.insideUnitCircle.normalized;
         }
