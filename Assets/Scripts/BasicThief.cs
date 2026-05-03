@@ -37,6 +37,8 @@ public class BasicThief : MonoBehaviour
         Move();
     }
 
+
+
     // =========================
     // WANDER (smooth random)
     // =========================
@@ -133,4 +135,31 @@ public class BasicThief : MonoBehaviour
             moveVec = Random.insideUnitCircle.normalized;
         }
     }
+
+    // =========================
+    // SEEK
+    // =========================
+    void Seek(Transform target, float speed)
+    {
+        Vector2 dir =
+            (target.position - transform.position).normalized;
+
+        moveVec = dir;
+
+        moveSpeed = speed;
+    }
+
+    // =========================
+    // FLEE
+    // =========================
+    void Flee(Transform target, float speed)
+    {
+        Vector2 dir =
+            (transform.position - target.position).normalized;
+
+        moveVec = dir;
+
+        moveSpeed = speed;
+    }
+
 }
