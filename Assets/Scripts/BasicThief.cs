@@ -37,8 +37,6 @@ public class BasicThief : MonoBehaviour
         Move();
     }
 
-
-
     // =========================
     // WANDER (smooth random)
     // =========================
@@ -53,41 +51,37 @@ public class BasicThief : MonoBehaviour
     }
 
     // =========================
-    // AVOID WALL (5 RAY)
+    // AVOID WALL (16 RAY - 360 degrees)
     // =========================
     Vector2 AvoidWall()
     {
-        Vector2 forward = rb.linearVelocity.magnitude > 0.1f
-            ? rb.linearVelocity.normalized
-            : moveVec.normalized;
-
-        float[] angles = { -60f, -30f, 0f, 30f, 60f };
+        int rayCount = 16; // jumlah ray (semakin banyak semakin halus)
+        float angleStep = 360f / rayCount;
 
         Vector2 avoid = Vector2.zero;
 
-        foreach (float angle in angles)
+        for (int i = 0; i < rayCount; i++)
         {
-            Vector2 dir = Quaternion.Euler(0, 0, angle) * forward;
-            avoid += CheckRay(dir);
+            float angle = i * angleStep;
+            Vector2 dir = new Vector2(
+                Mathf.Cos(angle * Mathf.Deg2Rad),
+                Mathf.Sin(angle * Mathf.Deg2Rad)
+            );
+
+            RaycastHit2D hit = Physics2D.Raycast(
+                transform.position,
+                dir,
+                avoidDistance,
+                wallLayer
+            );
+
+            if (hit.collider != null)
+            {
+                // semakin dekat semakin kuat dorongannya
+                float strength = (avoidDistance - hit.distance) / avoidDistance;
+                avoid += hit.normal * strength * avoidForce;
+            }
         }
-
-        // anti-stuck (kalau mentok depan)
-        RaycastHit2D frontHit = Physics2D.Raycast(
-            transform.position,
-            forward,
-            avoidDistance,
-            wallLayer
-        );
-
-        if (frontHit.collider != null)
-        {
-            Vector2 side = Vector2.Perpendicular(frontHit.normal);
-            avoid += side * avoidForce;
-        }
-
-        // sedikit randomness biar tidak kaku
-        avoid += Random.insideUnitCircle * 0.2f;
-
         return avoid;
     }
 
@@ -161,5 +155,12 @@ public class BasicThief : MonoBehaviour
 
         moveSpeed = speed;
     }
+    
+    // =========================
+    // PATH FINDING
+    // =========================
+    void PathFinding()
+    {
 
+    }
 }
