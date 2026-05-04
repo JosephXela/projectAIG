@@ -1,166 +1,86 @@
 using UnityEngine;
+using System.Collections.Generic;
 
 public class BasicThief : MonoBehaviour
 {
-    public float moveSpeed = 2f;
+    public Transform target;
+    public float moveSpeed = 3f;
 
-    Rigidbody2D rb;
-    Vector2 moveVec = Vector2.zero;
+    public float pathUpdateDelay = 0.5f;
 
-    public float wanderCooldown = 2.5f;
-    float timer;
+    private float timer;
 
-    float lastX = 0;
-    float lastY = 0;
+    private List<Node> currentPath;
+    private int pathIndex;
 
-    // obstacle avoidance
-    public float avoidDistance = 1.5f;
-    public float avoidForce = 8f;
-    public LayerMask wallLayer;
+    private Pathfinding pathfinding;
 
     void Start()
     {
-        rb = GetComponent<Rigidbody2D>();
-        timer = wanderCooldown;
+        pathfinding = FindFirstObjectByType<Pathfinding>();
     }
 
-    void FixedUpdate()
+    void Update()
     {
-        timer -= Time.deltaTime;
+        timer += Time.deltaTime;
 
-        if (timer <= 0)
+        // update path tiap beberapa detik
+        if (timer >= pathUpdateDelay)
         {
-            Wander();
-            timer = wanderCooldown;
+            timer = 0;
+            UpdatePath();
         }
 
-        Move();
+        FollowPath();
     }
 
-    // =========================
-    // WANDER (smooth random)
-    // =========================
-    void Wander()
+    void UpdatePath()
     {
-        Vector2 dir = Random.insideUnitCircle.normalized;
+        if (target == null) return;
 
-        moveVec = Vector2.Lerp(moveVec, dir, 0.5f);
-
-        lastX = moveVec.x;
-        lastY = moveVec.y;
+        currentPath = pathfinding.FindPath(transform.position, target.position);
+        pathIndex = 0;
     }
 
-    // =========================
-    // AVOID WALL (16 RAY - 360 degrees)
-    // =========================
-    Vector2 AvoidWall()
+    void FollowPath()
     {
-        int rayCount = 16; // jumlah ray (semakin banyak semakin halus)
-        float angleStep = 360f / rayCount;
+        if (currentPath == null || currentPath.Count == 0) return;
+        if (pathIndex >= currentPath.Count) return;
 
-        Vector2 avoid = Vector2.zero;
+        Vector3 targetPos = currentPath[pathIndex].worldPosition;
 
-        for (int i = 0; i < rayCount; i++)
-        {
-            float angle = i * angleStep;
-            Vector2 dir = new Vector2(
-                Mathf.Cos(angle * Mathf.Deg2Rad),
-                Mathf.Sin(angle * Mathf.Deg2Rad)
-            );
-
-            RaycastHit2D hit = Physics2D.Raycast(
-                transform.position,
-                dir,
-                avoidDistance,
-                wallLayer
-            );
-
-            if (hit.collider != null)
-            {
-                // semakin dekat semakin kuat dorongannya
-                float strength = (avoidDistance - hit.distance) / avoidDistance;
-                avoid += hit.normal * strength * avoidForce;
-            }
-        }
-        return avoid;
-    }
-
-    Vector2 CheckRay(Vector2 dir)
-    {
-        RaycastHit2D hit = Physics2D.Raycast(
+        // gerak ke node berikutnya
+        transform.position = Vector3.MoveTowards(
             transform.position,
-            dir,
-            avoidDistance,
-            wallLayer
+            targetPos,
+            moveSpeed * Time.deltaTime
         );
 
-        if (hit.collider != null)
+        // kalau sudah dekat, lanjut ke node berikutnya
+        if (Vector3.Distance(transform.position, targetPos) < 0.1f)
         {
-            return hit.normal * avoidForce;
-        }
-
-        return Vector2.zero;
-    }
-
-    // =========================
-    // MOVEMENT
-    // =========================
-    void Move()
-    {
-        Vector2 desired = moveVec * moveSpeed;
-
-        // bias supaya tidak muter
-        desired += rb.linearVelocity.normalized * 0.5f;
-
-        // avoidance tidak terlalu dominan
-        desired += AvoidWall() * 0.3f;
-
-        rb.linearVelocity = Vector2.SmoothDamp(
-            rb.linearVelocity,
-            desired,
-            ref moveVec,
-            Time.fixedDeltaTime * 6f
-        );
-
-        rb.linearVelocity = Vector2.ClampMagnitude(rb.linearVelocity, moveSpeed);
-
-        if (rb.linearVelocity.magnitude < 0.2f)
-        {
-            moveVec = Random.insideUnitCircle.normalized;
+            pathIndex++;
         }
     }
 
-    // =========================
-    // SEEK
-    // =========================
-    void Seek(Transform target, float speed)
+    // DEBUG PATH (biar keliatan di scene)
+    void OnDrawGizmos()
     {
-        Vector2 dir =
-            (target.position - transform.position).normalized;
+        if (currentPath == null) return;
 
-        moveVec = dir;
+        Gizmos.color = Color.black;
 
-        moveSpeed = speed;
+        foreach (Node n in currentPath)
+        {
+            Gizmos.DrawCube(n.worldPosition, Vector3.one * 0.3f);
+        }
     }
-
-    // =========================
-    // FLEE
-    // =========================
-    void Flee(Transform target, float speed)
+    private void OnTriggerEnter2D(Collider2D other)
     {
-        Vector2 dir =
-            (transform.position - target.position).normalized;
-
-        moveVec = dir;
-
-        moveSpeed = speed;
-    }
-    
-    // =========================
-    // PATH FINDING
-    // =========================
-    void PathFinding()
-    {
-
+        if (other.CompareTag("Exit"))
+        {
+            ThiefManager.Instance.AddEscape();
+            Destroy(gameObject);
+        }
     }
 }

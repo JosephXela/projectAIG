@@ -3,9 +3,6 @@ using System.Collections.Generic;
 
 public class GridBlock : MonoBehaviour
 {
-    public Transform startPos;
-    public Transform targetPos;
-
     public LayerMask wallMask;
     public Vector2 gridWorldSize;
 
@@ -15,7 +12,6 @@ public class GridBlock : MonoBehaviour
     public float distanceBetweenNodes;
 
     public Node[,] nodeGrid;
-    public List<Node> finalPath;
 
     public int gridSizeX, gridSizeY;
 
@@ -45,11 +41,11 @@ public class GridBlock : MonoBehaviour
                     + Vector3.up * (y * nodeDiameter + nodeRadius);
 
                 bool isWall = Physics2D.OverlapBox(
-                     worldPoint,
-                     Vector2.one * nodeDiameter * 0.9f,
-                     0,
-                     wallMask
-                 );
+                    worldPoint,
+                    Vector2.one * nodeDiameter * 0.8f,
+                    0,
+                    wallMask
+                );
 
                 nodeGrid[x, y] = new Node(isWall, worldPoint, x, y);
             }
@@ -64,7 +60,10 @@ public class GridBlock : MonoBehaviour
         {
             for (int y = -1; y <= 1; y++)
             {
+                // skip self
                 if (x == 0 && y == 0) continue;
+
+                // skip diagonal (4 arah saja)
                 if (Mathf.Abs(x) == Mathf.Abs(y)) continue;
 
                 int checkX = currentNode.gridX + x;
@@ -99,15 +98,6 @@ public class GridBlock : MonoBehaviour
     {
         if (nodeGrid == null) return;
 
-        Node playerNode = null;
-        Node targetNode = null;
-
-        if (startPos != null)
-            playerNode = NodeFromWorldPoint(startPos.position);
-
-        if (targetPos != null)
-            targetNode = NodeFromWorldPoint(targetPos.position);
-
         foreach (Node n in nodeGrid)
         {
             if (n.isWall)
@@ -115,16 +105,26 @@ public class GridBlock : MonoBehaviour
             else
                 Gizmos.color = Color.white;
 
-            if (finalPath != null && finalPath.Contains(n))
-                Gizmos.color = Color.black;
-
-            if (playerNode != null && playerNode == n)
-                Gizmos.color = Color.green;
-
-            if (targetNode != null && targetNode == n)
-                Gizmos.color = Color.cyan;
-
             Gizmos.DrawCube(n.worldPosition, Vector3.one * (nodeDiameter - distanceBetweenNodes));
         }
+    }
+
+    public Node GetRandomWalkableNode(Vector3 position, float radius)
+    {
+        List<Node> candidates = new List<Node>();
+
+        foreach (Node n in nodeGrid)
+        {
+            if (!n.isWall &&
+                Vector3.Distance(n.worldPosition, position) <= radius)
+            {
+                candidates.Add(n);
+            }
+        }
+
+        if (candidates.Count == 0)
+            return null;
+
+        return candidates[Random.Range(0, candidates.Count)];
     }
 }
