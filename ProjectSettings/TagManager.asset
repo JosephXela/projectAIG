@@ -6,6 +6,7 @@ TagManager:
   tags:
   - Exit
   - Thief
+  - Cash
   layers:
   - Default
   - TransparentFX

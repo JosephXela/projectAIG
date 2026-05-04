@@ -6,6 +6,7 @@ public class ThiefManager : MonoBehaviour
 
     public static int totalThief = 0;
     public static int totalEscaped = 0;
+    public static int totalCash = 0;
 
     private void Awake()
     {
@@ -26,5 +27,10 @@ public class ThiefManager : MonoBehaviour
         {
             PlayerManager.Instance.RestartScene();
         }
+    }
+    public void AddCash()
+    {
+        totalCash++;
+        Debug.Log("Cash Collected: " + totalCash);
     }
 }

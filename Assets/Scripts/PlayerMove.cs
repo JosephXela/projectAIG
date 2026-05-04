@@ -26,6 +26,7 @@ public class PlayerMove : MonoBehaviour
     {
         if (goToExit)
         {
+            moveSpeed = 2f;
             FollowPath();
         }
         else
@@ -59,13 +60,6 @@ public class PlayerMove : MonoBehaviour
             {
                 goToExit = false;
             }
-
-
-        }
-        if (other.CompareTag("Exit"))
-        {
-            goToExit = false;
-            rb.linearVelocity = Vector2.zero;
         }
     }
     void FollowPath()

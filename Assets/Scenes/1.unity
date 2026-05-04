@@ -436,8 +436,8 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 64
   gridWorldSize: {x: 20, y: 10}
-  nodeRadius: 0.1
-  distanceBetweenNodes: 0.05
+  nodeRadius: 0.2
+  distanceBetweenNodes: 0.1
   gridSizeX: 0
   gridSizeY: 0
 --- !u!114 &124080681
