@@ -700,14 +700,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4af184b9d101c774d9fe9eca72fbdb30, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  startPos: {fileID: 0}
-  targetPos: {fileID: 0}
   wallMask:
     serializedVersion: 2
     m_Bits: 64
   gridWorldSize: {x: 20, y: 10}
-  nodeRadius: 0.15
-  distanceBetweenNodes: 0.1
+  nodeRadius: 0.1
+  distanceBetweenNodes: 0.05
   gridSizeX: 0
   gridSizeY: 0
 --- !u!114 &124080681
@@ -722,8 +720,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 02addc00f0523814bbf711de930b572c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  startPos: {fileID: 0}
-  targetPos: {fileID: 0}
 --- !u!1 &124581758
 GameObject:
   m_ObjectHideFlags: 0
@@ -7787,6 +7783,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   moveSpeed: 3
+  exitTarget: {fileID: 0}
+  goToExit: 0
 --- !u!50 &1114201123
 Rigidbody2D:
   serializedVersion: 5

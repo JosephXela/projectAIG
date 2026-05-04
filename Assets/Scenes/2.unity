@@ -700,14 +700,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4af184b9d101c774d9fe9eca72fbdb30, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  startPos: {fileID: 0}
-  targetPos: {fileID: 0}
   wallMask:
     serializedVersion: 2
     m_Bits: 64
   gridWorldSize: {x: 20, y: 10}
-  nodeRadius: 0.15
-  distanceBetweenNodes: 0.1
+  nodeRadius: 0.1
+  distanceBetweenNodes: 0.05
   gridSizeX: 0
   gridSizeY: 0
 --- !u!114 &124080681
@@ -722,8 +720,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 02addc00f0523814bbf711de930b572c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  startPos: {fileID: 0}
-  targetPos: {fileID: 0}
 --- !u!1 &139838016
 GameObject:
   m_ObjectHideFlags: 0
@@ -5448,6 +5444,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   moveSpeed: 3
+  exitTarget: {fileID: 0}
+  goToExit: 0
 --- !u!50 &1114201123
 Rigidbody2D:
   serializedVersion: 5
@@ -6727,8 +6725,8 @@ Transform:
   m_GameObject: {fileID: 1328105473}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 4.59, y: 3.46, z: 0.024724307}
-  m_LocalScale: {x: 0.19999999, y: 1.2706852, z: 1}
+  m_LocalPosition: {x: 4.55, y: 3.64, z: 0.024724307}
+  m_LocalScale: {x: 0.19333398, y: 0.9375978, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 139838017}
