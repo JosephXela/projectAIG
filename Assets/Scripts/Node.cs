@@ -5,15 +5,7 @@ public class Node
     public int gridY;
 
     public bool isWall;
-
     public Vector3 worldPosition;
-
-    public Node parentNode;
-
-    public int moveCost;       // g cost
-    public int heuristicCost;  // h cost
-
-    public int TotalCost => moveCost + heuristicCost;
 
     public Node(bool isWall, Vector3 worldPosition, int gridX, int gridY)
     {

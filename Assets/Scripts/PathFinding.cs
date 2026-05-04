@@ -5,91 +5,98 @@ public class Pathfinding : MonoBehaviour
 {
     GridBlock gridRef;
 
-    public Transform startPos;
-    public Transform targetPos;
-
     private void Awake()
     {
         gridRef = GetComponent<GridBlock>();
     }
 
-    private void Update()
+    public List<Node> FindPath(Vector3 startPosInp, Vector3 targetPosInp)
     {
-        if (startPos != null && targetPos != null)
-        {
-            FindPath(startPos.position, targetPos.position);
-        }
-    }
+        Dictionary<Node, NodeData> nodeDataMap = new Dictionary<Node, NodeData>();
 
-    public void FindPath(Vector3 startPosInp, Vector3 targetPosInp)
-    {
+        NodeData GetData(Node node)
+        {
+            if (!nodeDataMap.ContainsKey(node))
+                nodeDataMap[node] = new NodeData(node);
+
+            return nodeDataMap[node];
+        }
+
         Node startNode = gridRef.NodeFromWorldPoint(startPosInp);
         Node targetNode = gridRef.NodeFromWorldPoint(targetPosInp);
 
-        List<Node> openList = new List<Node>();
-        HashSet<Node> closedList = new HashSet<Node>();
+        NodeData startData = GetData(startNode);
+        NodeData targetData = GetData(targetNode);
 
-        openList.Add(startNode);
+        List<NodeData> openList = new List<NodeData>();
+        HashSet<NodeData> closedList = new HashSet<NodeData>();
+
+        openList.Add(startData);
 
         while (openList.Count > 0)
         {
-            Node currentNode = openList[0];
+            NodeData current = openList[0];
 
             for (int i = 1; i < openList.Count; i++)
             {
-                if (openList[i].TotalCost < currentNode.TotalCost ||
-                   (openList[i].TotalCost == currentNode.TotalCost &&
-                    openList[i].heuristicCost < currentNode.heuristicCost))
+                if (openList[i].fCost < current.fCost ||
+                   (openList[i].fCost == current.fCost &&
+                    openList[i].hCost < current.hCost))
                 {
-                    currentNode = openList[i];
+                    current = openList[i];
                 }
             }
 
-            openList.Remove(currentNode);
-            closedList.Add(currentNode);
+            openList.Remove(current);
+            closedList.Add(current);
 
-            if (currentNode == targetNode)
+            if (current.node == targetNode)
             {
-                GetFinalPath(startNode, targetNode);
-                return;
+                return RetracePath(startData, current);
             }
 
-            foreach (Node neighborNode in gridRef.GetNeighboringNodes(currentNode))
+            foreach (Node neighbor in gridRef.GetNeighboringNodes(current.node))
             {
-                if (neighborNode.isWall || closedList.Contains(neighborNode))
+                if (neighbor.isWall) continue;
+
+                NodeData neighborData = GetData(neighbor);
+
+                if (closedList.Contains(neighborData))
                     continue;
 
-                int newCost = currentNode.moveCost + GetManhattanDistance(currentNode, neighborNode);
+                int newCost = current.gCost + GetDistance(current.node, neighbor);
 
-                if (newCost < neighborNode.moveCost || !openList.Contains(neighborNode))
+                if (newCost < neighborData.gCost || !openList.Contains(neighborData))
                 {
-                    neighborNode.moveCost = newCost;
-                    neighborNode.heuristicCost = GetManhattanDistance(neighborNode, targetNode);
-                    neighborNode.parentNode = currentNode;
+                    neighborData.gCost = newCost;
+                    neighborData.hCost = GetDistance(neighbor, targetNode);
+                    neighborData.parent = current;
 
-                    if (!openList.Contains(neighborNode))
-                        openList.Add(neighborNode);
+                    if (!openList.Contains(neighborData))
+                        openList.Add(neighborData);
                 }
             }
         }
+
+        return null;
     }
 
-    void GetFinalPath(Node startNode, Node endNode)
+    List<Node> RetracePath(NodeData start, NodeData end)
     {
-        List<Node> finalPath = new List<Node>();
-        Node currentNode = endNode;
+        List<Node> path = new List<Node>();
+        NodeData current = end;
 
-        while (currentNode != startNode)
+        while (current != start)
         {
-            finalPath.Add(currentNode);
-            currentNode = currentNode.parentNode;
+            path.Add(current.node);
+            current = current.parent;
         }
 
-        finalPath.Reverse();
-        gridRef.finalPath = finalPath;
+        path.Reverse();
+        return path;
     }
 
-    int GetManhattanDistance(Node a, Node b)
+    int GetDistance(Node a, Node b)
     {
         int dx = Mathf.Abs(a.gridX - b.gridX);
         int dy = Mathf.Abs(a.gridY - b.gridY);
