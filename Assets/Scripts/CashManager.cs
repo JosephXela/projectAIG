@@ -8,6 +8,7 @@ public class CashManager : MonoBehaviour
     {
         Instance = this;
     }
+    //method untuk "daftarkan" object cash
     public void RegisterCash()
     {
         cashes++;

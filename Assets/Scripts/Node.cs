@@ -1,6 +1,8 @@
 using UnityEngine;
 public class Node
 {
+    //menyimpan data grid/dunia
+
     public int gridX;
     public int gridY;
 

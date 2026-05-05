@@ -13,13 +13,13 @@ public class PlayerManager : MonoBehaviour
         Instance = this;
     }
 
-
+    //method untuk "hitung" object thief yang ditangkap player
     public void AddCaptured()
     {
         totalCaptured++;
         Debug.Log("Thief captured: " + totalCaptured);
     }
-
+    //method restart scene
     public void RestartScene()
     {
         Debug.Log("RESTART!");

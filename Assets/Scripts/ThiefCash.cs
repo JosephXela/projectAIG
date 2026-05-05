@@ -46,27 +46,29 @@ public class ThiefCash : MonoBehaviour
 
     Transform GetClosestCash()
     {
-        GameObject[] allCash = GameObject.FindGameObjectsWithTag("Cash");
+        GameObject[] allCash = GameObject.FindGameObjectsWithTag("Cash"); //cari semua object bertag "Cash"
 
-        float minDist = Mathf.Infinity;
-        Transform nearest = null;
+        //inisial kandidat terbaik
+        float minDist = Mathf.Infinity; //dimulai dari nilai terbesar supaya cash pertama valid pasti menang di perbandingan pertama
+        Transform nearest = null; //null dulu sampai ada kandidat valid
 
+        //loop + skipp null
         foreach (GameObject cash in allCash)
         {
             if (cash == null) continue;
 
+            //cek jarak deteksi, terlalu jauh skip
             float dist = Vector2.Distance(transform.position, cash.transform.position);
-
             if (dist > cashDetecRange) continue;
 
+            //cek apakah cash bisa dijangkau
             List<Node> testPath = pathfinding.FindPath(transform.position, cash.transform.position);
-
             if (testPath == null || testPath.Count == 0)
             {
-                Debug.LogWarning("Cash tidak reachable: " + cash.name);
                 continue;
             }
 
+            //pilih yang terdekat
             if (dist < minDist)
             {
                 minDist = dist;
@@ -81,21 +83,22 @@ public class ThiefCash : MonoBehaviour
     {
         float distToPolice = Vector3.Distance(transform.position, police.position);
 
+        //cash search random
+        //timer countdown setiap frame, reset ke cashSearchCooldown saat habis
         cashSearchTimer -= Time.deltaTime;
         if (cashSearchTimer <= 0f)
         {
             cashSearchTimer = cashSearchCooldown;
 
+            //cek apakah cash sudah di-Destroy. Object yang di-Destroy tidak langsung null di Unity, tapi activeInHierarchy jadi false.
             if (cashTarget == null || !cashTarget.gameObject.activeInHierarchy)
             {
                 cashTarget = GetClosestCash();
-                lastCashTarget = null; 
+                lastCashTarget = null; //paksa SeekCash() rebuild path karena target baru.
             }
         }
-
-        float distToCash = cashTarget != null
-            ? Vector2.Distance(transform.position, cashTarget.position)
-            : Mathf.Infinity;
+        //jika cashTarge tidak sama dengan null, maka hitung jarak antara thief dengan objek, selain itu jarak tak terhingga (jaraknya dianggap sangat jauh sekali)
+        float distToCash = cashTarget != null ? Vector2.Distance(transform.position, cashTarget.position) : Mathf.Infinity;
 
         ThiefState nextState;
 
@@ -105,10 +108,12 @@ public class ThiefCash : MonoBehaviour
         }
         else if (goToExit)
         {
+            //semua cash sudah diambil
             nextState = ThiefState.Seek;
         }
         else if (cashTarget != null && distToCash < cashDetecRange)
         {
+            //ada cash dalam jangkauan
             nextState = ThiefState.SeekCash;
         }
         else
@@ -116,6 +121,7 @@ public class ThiefCash : MonoBehaviour
             nextState = ThiefState.Wander;
         }
 
+        //setiap state hanya reset path sekali setiap frame (reset saat state benar-benar berganti)
         if (nextState != previousState)
         {
             currentState = nextState;
@@ -154,64 +160,39 @@ public class ThiefCash : MonoBehaviour
 
         FollowPath();
     }
-
-    // =========================
-    // PATH FOLLOW
-    // =========================
     void FollowPath()
     {
-        if (currentState == ThiefState.Flee) return;
+        if (currentState == ThiefState.Flee) return; //tidak mengikuti path
 
-        if (currentPath == null || currentPath.Count == 0) return;
-        if (pathIndex >= currentPath.Count) return;
+        if (currentPath == null || currentPath.Count == 0) return; //path belum dibuat/kosong, tidak bisa diikuti
+        if (pathIndex >= currentPath.Count) return; //kalau semua node sudah dilewati (sudah sampai tujuan)
 
-        Vector3 targetPos = currentPath[pathIndex].worldPosition;
+        Vector3 targetPos = currentPath[pathIndex].worldPosition; //ambil node yang sedang dituju dari list of nodes
 
-        transform.position = Vector3.MoveTowards(
-            transform.position,
-            targetPos,
-            moveSpeed * Time.deltaTime
-        );
+        //tambah steering di sini
+        Vector3 desiredDir = (targetPos - transform.position).normalized;
+        Vector3 finalDir = GetAvoidDirection(desiredDir, 0.3f, 8); // rayLength pendek, rayCount sedikit
 
-        if (Vector3.Distance(transform.position, targetPos) < 0.05f)
+        transform.position += finalDir * moveSpeed * Time.deltaTime;
+
+        //cek apakah sudah sampai node, jika node kurang dari 0.1f, anggap sudah sampai, naikkan pathIndex agar frame berikutnya menuju node selanjutnya
+        if (Vector3.Distance(transform.position, targetPos) < 0.01f)
         {
             pathIndex++;
         }
     }
-
-    // =========================
-    // SEEK (KE EXIT)
-    // =========================
     void SeekExit()
     {
-        if (exitTarget == null)
-        {
-            Debug.LogWarning("Exit target belum di-assign!");
-            return;
-        }
+        if (exitTarget == null) return; //cek exit sudah diassign apa belum
+        if (pathfinding == null) return; //cek pathfinding sudah ada apa belum
 
-        if (pathfinding == null)
-        {
-            Debug.LogWarning("Pathfinding tidak ditemukan!");
-            return;
-        }
-
+        //kalau path belum siap atau sudah habis, hitung path dari posisi thief ke exit, reset pathIndex (node mulai dari node pertama)
         if (currentPath == null || currentPath.Count == 0 || pathIndex >= currentPath.Count)
         {
             currentPath = pathfinding.FindPath(transform.position, exitTarget.position);
             pathIndex = 0;
-
-            if (currentPath == null || currentPath.Count == 0)
-            {
-                Debug.LogWarning("Path ke exit gagal dibuat! Posisi thief: "
-                + transform.position + " | Posisi exitTarget: " + exitTarget.position);
-            }
         }
     }
-
-    // =========================
-    // SEEK (KE CASH)
-    // =========================
     void SeekCash()
     {
         if (cashTarget == null)
@@ -222,6 +203,7 @@ public class ThiefCash : MonoBehaviour
             return;
         }
 
+        //kondisi kapan path diubat ulang (kondisi : kalau path tidak valid atau target berubah)
         if (
             currentPath == null ||
             currentPath.Count == 0 ||
@@ -229,13 +211,14 @@ public class ThiefCash : MonoBehaviour
             lastCashTarget != cashTarget
         )
         {
+            //buat path baru
             currentPath = pathfinding.FindPath(transform.position, cashTarget.position);
             pathIndex = 0;
             lastCashTarget = cashTarget;
 
+            //handle path gagal
             if (currentPath == null || currentPath.Count == 0)
             {
-                Debug.LogWarning("Path ke cash gagal dibuat: " + cashTarget.name);
                 cashTarget = null;
                 lastCashTarget = null;
                 currentState = ThiefState.Wander;
@@ -243,55 +226,45 @@ public class ThiefCash : MonoBehaviour
             }
         }
     }
-
-    // =========================
-    // FLEE (STEERING, TANPA A*)
-    // =========================
     void Flee()
     {
-        if (police == null) return;
+        if (police == null) return; //cek (player) sudah diassign apa belum
 
-        Vector3 desiredDir = (transform.position - police.position).normalized;
-        Vector3 finalDir = GetAvoidDirection(desiredDir, 1.2f, 16);
+        Vector3 desiredDir = (transform.position - police.position).normalized; //arah yang diinginkan (posisi thief - posisi player)
+        Vector3 finalDir = GetAvoidDirection(desiredDir, 1.2f, 16);  //menjauhi wall, tidak kena wall
 
-        float fleeSpeed = moveSpeed * fleeSpeedMultiplier;
+        float fleeSpeed = moveSpeed * fleeSpeedMultiplier; //kecepatan flee lebih cepat dari kecepatan normal (steering)
         transform.position += finalDir * fleeSpeed * Time.deltaTime;
 
-        currentPath = null;
+        currentPath = null; //menghapus path
     }
-
-    // =========================
-    // WANDER (SELESAIKAN PATH DULU)
-    // =========================
     void Wander()
     {
+        //jika path null atau kosong, generate path baru ke titik random
         if (currentPath == null || currentPath.Count == 0)
         {
             GenerateNewWanderPath();
             return;
         }
 
+        //jika path sudah habis dilalui, semua node sudah dilewati, generate path baru
         if (pathIndex >= currentPath.Count)
         {
             GenerateNewWanderPath();
         }
     }
-
     void GenerateNewWanderPath()
     {
-        GridBlock grid = FindFirstObjectByType<GridBlock>();
-        Node randomNode = grid.GetRandomWalkableNode(transform.position, 4f);
+        GridBlock grid = FindFirstObjectByType<GridBlock>(); //ambil referensi grid
+        Node randomNode = grid.GetRandomWalkableNode(transform.position, 4f); //mencari random node yang walkable dalam radius 4f dari posisi thief sekarang
 
+        //buath path ke random node tersebut, bisa null
         if (randomNode != null)
         {
             currentPath = pathfinding.FindPath(transform.position, randomNode.worldPosition);
             pathIndex = 0;
         }
     }
-
-    // =========================
-    // EXIT / CASH DETECTION
-    // =========================
     private void OnTriggerEnter2D(Collider2D other)
     {
         if (other.CompareTag("Exit") && goToExit)
@@ -314,10 +287,6 @@ public class ThiefCash : MonoBehaviour
             Debug.Log("Go to exit: " + goToExit);
         }
     }
-
-    // =========================
-    // DEBUG PATH
-    // =========================
     void OnDrawGizmos()
     {
         if (currentPath == null) return;
@@ -328,17 +297,20 @@ public class ThiefCash : MonoBehaviour
             Gizmos.DrawCube(n.worldPosition, Vector3.one * 0.3f);
         }
     }
-
     Vector3 GetAvoidDirection(Vector3 desiredDir, float rayLength = 0.7f, int rayCount = 32)
     {
-        Vector3 bestDir = desiredDir;
-        float bestScore = -Mathf.Infinity;
-
+        //desiredDir = arah yang diinginkan (menjauhi player/menuju node), rayLength = seberapa jauh raycast mendeteksi obstacle, rayCount = jumlah arah
+        Vector3 bestDir = desiredDir; //asusmi arah terbaik
+        float bestScore = -Mathf.Infinity;//nilai paling kecil, supaya arah apapun yang valid pasti menang di perbandingan pertama. 
+        
+        //hitung sudut tiap ray
+        //bagi 360° secara merata sebanyak rayCount, setiap ray dirotasi dari desiredDir, bukan dari sumbu tetap.
         for (int i = 0; i < rayCount; i++)
         {
             float angle = (360f / rayCount) * i;
             Vector3 dir = Quaternion.Euler(0, 0, angle) * desiredDir;
 
+            //tembak ray dari posisi thief ke arah dir sejauh rayLength, hanya deteksi layer Obstacle
             RaycastHit2D hit = Physics2D.Raycast(
                 transform.position,
                 dir,
@@ -346,11 +318,14 @@ public class ThiefCash : MonoBehaviour
                 LayerMask.GetMask("Obstacle")
             );
 
+            //skip arah yang kena obstacle
             if (hit.collider != null)
                 continue;
 
+            //pilih arah terbaik
+            //dari semua arah yang tidak kena obstacle, pilih yang dot product-nya paling tinggi = paling mirip dengan arah asli yang diinginkan
+            //dot = 1 (lurus), dot = 0 (belok 90 derajat), dot = -1 (balik arah)
             float score = Vector3.Dot(dir, desiredDir);
-
             if (score > bestScore)
             {
                 bestScore = score;

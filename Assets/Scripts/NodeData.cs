@@ -2,10 +2,13 @@ using UnityEngine;
 
 public class NodeData
 {
-    public Node node;
+    //menyimpan data perhitungan A* untuk node tersebut selama pathfinding berlangsung
+    //dipakai sementara saat FindPath() jalan, dibuang setelah path ketemu
+
+    public Node node; //node grid aslinya
     public int gCost;
     public int hCost;
-    public NodeData parent;
+    public NodeData parent; //node sebelumnya di path terbaik (menyimpan "dari mana saya datang")
 
     public int fCost => gCost + hCost;
 

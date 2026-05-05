@@ -14,12 +14,13 @@ public class ThiefManager : MonoBehaviour
         Instance = this;
     }
 
+    //method untuk "daftarkan" object thief
     public void RegisterThief()
     {
         totalThief++;
         Debug.Log("Total Thief: " + totalThief);
     }
-
+    //method untuk "hitung" object thief yang keluar
     public void AddEscape()
     {
         totalEscaped++;
@@ -29,6 +30,7 @@ public class ThiefManager : MonoBehaviour
             PlayerManager.Instance.RestartScene();
         }
     }
+    //method untuk "hitung" object cash yang ditangkap thief
     public void AddCash()
     {
         totalCash++;

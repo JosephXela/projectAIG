@@ -3360,7 +3360,7 @@ Transform:
   m_GameObject: {fileID: 889276794}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 4.17, y: -4.42, z: 0}
+  m_LocalPosition: {x: 5.92, y: -0.43, z: 0}
   m_LocalScale: {x: 1.5, y: 1.5, z: 2}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -4420,7 +4420,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: def23824dc8bbe943905262c0004e990, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  moveSpeed: 8
+  moveSpeed: 2
   exitTarget: {fileID: 1010604879}
   goToExit: 0
   civilianPrefab: {fileID: 0}
@@ -6710,7 +6710,7 @@ Transform:
   m_GameObject: {fileID: 1615353665}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 7.09, y: -4.21, z: 0}
+  m_LocalPosition: {x: -5.67, y: 1.45, z: 0}
   m_LocalScale: {x: 1.5, y: 1.5, z: 2}
   m_ConstrainProportionsScale: 0
   m_Children: []
