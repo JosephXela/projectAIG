@@ -322,7 +322,7 @@ public class ThiefCash : MonoBehaviour
                 continue;
 
             //pilih arah terbaik
-            //dari semua arah yang tidak kena obstacle, pilih yang dot product-nya paling tinggi = paling mirip dengan arah asli yang diinginkan
+            //dari semua arah yang tidak kena obstacle, pilih yang dot productnya paling tinggi = paling mirip dengan arah asli yang diinginkan
             //dot = 1 (lurus), dot = 0 (belok 90 derajat), dot = -1 (balik arah)
             float score = Vector3.Dot(dir, desiredDir);
             if (score > bestScore)
