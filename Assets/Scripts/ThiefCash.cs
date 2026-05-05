@@ -81,47 +81,51 @@ public class ThiefCash : MonoBehaviour
 
     void Update()
     {
-        float distToPolice = Vector3.Distance(transform.position, police.position);
+        UpdateCashTarget();
+        ThiefState nextState = ChooseState();
+        HandleState(nextState);
+        MyState();
+        FollowPath();
+    }
 
-        //cash search random
-        //timer countdown setiap frame, reset ke cashSearchCooldown saat habis
+    void UpdateCashTarget()
+    {
+        //timer cooldown buat nyari cash terdekat
         cashSearchTimer -= Time.deltaTime;
         if (cashSearchTimer <= 0f)
         {
             cashSearchTimer = cashSearchCooldown;
-
-            //cek apakah cash sudah di-Destroy. Object yang di-Destroy tidak langsung null di Unity, tapi activeInHierarchy jadi false.
+            //cek apakah cash sudah di-Destroy
+            //Object yang di-Destroy tidak langsung null di Unity, tapi activeInHierarchy jadi false
             if (cashTarget == null || !cashTarget.gameObject.activeInHierarchy)
             {
                 cashTarget = GetClosestCash();
-                lastCashTarget = null; //paksa SeekCash() rebuild path karena target baru.
+                lastCashTarget = null; // paksa SeekCash() rebuild path karena target baru
             }
         }
-        //jika cashTarge tidak sama dengan null, maka hitung jarak antara thief dengan objek, selain itu jarak tak terhingga (jaraknya dianggap sangat jauh sekali)
-        float distToCash = cashTarget != null ? Vector2.Distance(transform.position, cashTarget.position) : Mathf.Infinity;
-
-        ThiefState nextState;
+    }
+    ThiefState ChooseState()
+    {
+        float distToPolice = Vector3.Distance(transform.position, police.position);
+        // jika cashTarget tidak null, hitung jarak. Kalau null, anggap sangat jauh
+        float distToCash = cashTarget != null
+            ? Vector2.Distance(transform.position, cashTarget.position)
+            : Mathf.Infinity;
 
         if (distToPolice < fleeRange)
-        {
-            nextState = ThiefState.Flee;
-        }
-        else if (goToExit)
-        {
-            //semua cash sudah diambil
-            nextState = ThiefState.Seek;
-        }
-        else if (cashTarget != null && distToCash < cashDetecRange)
-        {
-            //ada cash dalam jangkauan
-            nextState = ThiefState.SeekCash;
-        }
-        else
-        {
-            nextState = ThiefState.Wander;
-        }
+            return ThiefState.Flee;
 
-        //setiap state hanya reset path sekali setiap frame (reset saat state benar-benar berganti)
+        if (goToExit)
+            return ThiefState.Seek; // semua cash sudah diambil
+
+        if (cashTarget != null && distToCash < cashDetecRange)
+            return ThiefState.SeekCash; // ada cash dalam jangkauan
+
+        return ThiefState.Wander;
+    }
+    void HandleState(ThiefState nextState)
+    {
+        // reset path hanya saat state benar-benar berganti
         if (nextState != previousState)
         {
             currentState = nextState;
@@ -133,21 +137,20 @@ public class ThiefCash : MonoBehaviour
         {
             currentState = nextState;
         }
-
+    }
+    void MyState()
+    {
         switch (currentState)
         {
             case ThiefState.Seek:
                 SeekExit();
                 break;
-
             case ThiefState.Flee:
                 Flee();
                 break;
-
             case ThiefState.Wander:
                 Wander();
                 break;
-
             case ThiefState.SeekCash:
                 if (cashTarget == null)
                 {
@@ -157,8 +160,6 @@ public class ThiefCash : MonoBehaviour
                 SeekCash();
                 break;
         }
-
-        FollowPath();
     }
     void FollowPath()
     {

@@ -33,8 +33,17 @@ public class ThiefHostage : MonoBehaviour
         pathfinding = FindFirstObjectByType<Pathfinding>();
         ThiefManager.Instance.RegisterThief();
     }
-
     void Update()
+    {
+        ThiefState nextState = ChooseState();
+
+        HandleState(nextState);
+
+        MyState();
+
+        FollowPath();
+    }
+    ThiefState ChooseState()
     {
         float distToPolice = Vector3.Distance(transform.position, police.position);
         float distToExit = Vector3.Distance(transform.position, exitTarget.position);
@@ -43,17 +52,19 @@ public class ThiefHostage : MonoBehaviour
 
         if (distToPolice < fleeRange)
         {
-            nextState = ThiefState.Flee;
+            return ThiefState.Flee;
         }
         else if (distToExit < detectionRange)
         {
-            nextState = ThiefState.Seek;
+            return ThiefState.Seek;
         }
         else
         {
-            nextState = ThiefState.Wander;
+            return ThiefState.Wander;
         }
-
+    }
+    void HandleState(ThiefState nextState)
+    {
         //setiap state hanya reset path sekali setiap frame (reset saat state benar-benar berganti)
         if (nextState != previousState)
         {
@@ -66,23 +77,24 @@ public class ThiefHostage : MonoBehaviour
         {
             currentState = nextState;
         }
-
+    }
+    void MyState()
+    {
         switch (currentState)
         {
             case ThiefState.Seek:
                 SeekExit();
                 break;
+
             case ThiefState.Flee:
                 Flee();
                 break;
+
             case ThiefState.Wander:
                 Wander();
                 break;
         }
-
-        FollowPath();
     }
-
     void FollowPath()
     {
         if (currentState == ThiefState.Flee) return; //tidak mengikuti path
@@ -103,7 +115,6 @@ public class ThiefHostage : MonoBehaviour
             pathIndex++;
         }
     }
-
     void SeekExit()
     {
         if (exitTarget == null) return; //cek exit sudah diassign apa belum
@@ -115,7 +126,6 @@ public class ThiefHostage : MonoBehaviour
             pathIndex = 0;
         }
     }
-
     void Flee()
     {
         if (police == null) return; //cek (player) sudah diassign apa belum
@@ -128,7 +138,6 @@ public class ThiefHostage : MonoBehaviour
 
         currentPath = null; //menghapus path
     }
-
     void Wander()
     {
         //jika path null atau kosong, generate path baru ke titik random
@@ -144,7 +153,6 @@ public class ThiefHostage : MonoBehaviour
             GenerateNewWanderPath();
         }
     }
-
     void GenerateNewWanderPath()
     {
         GridBlock grid = FindFirstObjectByType<GridBlock>(); //ambil referensi grid
@@ -157,7 +165,6 @@ public class ThiefHostage : MonoBehaviour
             pathIndex = 0;
         }
     }
-
     private void OnTriggerEnter2D(Collider2D other)
     {
         if (other.CompareTag("Exit"))
@@ -166,7 +173,6 @@ public class ThiefHostage : MonoBehaviour
             Destroy(gameObject);
         }
     }
-
     void OnDrawGizmos()
     {
         if (currentPath == null) return;
@@ -175,7 +181,6 @@ public class ThiefHostage : MonoBehaviour
         foreach (Node n in currentPath)
             Gizmos.DrawCube(n.worldPosition, Vector3.one * 0.3f);
     }
-
     Vector3 GetAvoidDirection(Vector3 desiredDir, float rayLength = 0.7f, int rayCount = 32)
     {
         //desiredDir = arah yang diinginkan (menjauhi player/menuju node), rayLength = seberapa jauh raycast mendeteksi obstacle, rayCount = jumlah arah
