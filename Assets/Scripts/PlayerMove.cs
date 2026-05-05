@@ -15,6 +15,8 @@ public class PlayerMove : MonoBehaviour
     private int pathIndex;
     public bool goToExit = false;
 
+    public GameObject civilianPrefab;
+
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
@@ -48,6 +50,25 @@ public class PlayerMove : MonoBehaviour
         {
             PlayerManager.Instance.AddCaptured();
             Destroy(other.gameObject);
+            int thief = ThiefManager.totalThief;
+            int capturedThief = PlayerManager.totalCaptured;
+            if (capturedThief == thief)
+            {
+                currentPath = pathfinding.FindPath(transform.position, exitTarget.position);
+                pathIndex = 0;
+                goToExit = true;
+            }
+            else
+            {
+                goToExit = false;
+            }
+        }
+        else if (other.CompareTag("ThiefHostage"))
+        {
+            PlayerManager.Instance.AddCaptured();
+            Vector3 spawnPos = other.transform.position;
+            Destroy(other.gameObject);
+            Instantiate(civilianPrefab, spawnPos, Quaternion.identity);
             int thief = ThiefManager.totalThief;
             int capturedThief = PlayerManager.totalCaptured;
             if (capturedThief == thief)
