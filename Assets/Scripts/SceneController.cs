@@ -20,7 +20,16 @@ public class SceneController : MonoBehaviour
     }
     public void NextLevel()
     {
-        SceneManager.LoadSceneAsync(SceneManager.GetActiveScene().buildIndex + 1);
+        int nextSceneIdx = SceneManager.GetActiveScene().buildIndex + 1;
+        //jika maks scene, tidak ada scene berikutnya
+        if (nextSceneIdx >= SceneManager.sceneCountInBuildSettings)
+        {
+            SceneManager.LoadScene(0); //ke level 1
+        }
+        else
+        {
+            SceneManager.LoadScene(nextSceneIdx);
+        }
     }
     public void LoadScene(string sceneName)
     {
