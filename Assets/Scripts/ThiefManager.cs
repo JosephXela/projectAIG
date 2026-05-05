@@ -25,10 +25,6 @@ public class ThiefManager : MonoBehaviour
     {
         totalEscaped++;
         Debug.Log("Thief escaped: " + totalEscaped);
-        if (totalEscaped == totalThief)
-        {
-            PlayerManager.Instance.RestartScene();
-        }
     }
     //method untuk "hitung" object cash yang ditangkap thief
     public void AddCash()
