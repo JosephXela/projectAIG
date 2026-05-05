@@ -1,7 +1,7 @@
 using UnityEngine;
 using System.Collections.Generic;
 
-public class BasicThief : MonoBehaviour
+public class ThiefHostage : MonoBehaviour
 {
     public Transform exitTarget;
     public Transform police;

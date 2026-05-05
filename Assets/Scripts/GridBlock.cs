@@ -60,11 +60,9 @@ public class GridBlock : MonoBehaviour
         {
             for (int y = -1; y <= 1; y++)
             {
-                // skip self
-                if (x == 0 && y == 0) continue;
+                if (x == 0 && y == 0) continue; //skip node sendiri
 
-                // skip diagonal (4 arah saja)
-                if (Mathf.Abs(x) == Mathf.Abs(y)) continue;
+                if (Mathf.Abs(x) == Mathf.Abs(y)) continue; //skip diagonal (4 arah saja)
 
                 int checkX = currentNode.gridX + x;
                 int checkY = currentNode.gridY + y;

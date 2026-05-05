@@ -7,6 +7,7 @@ public class ThiefManager : MonoBehaviour
     public static int totalThief = 0;
     public static int totalEscaped = 0;
     public static int totalCash = 0;
+    public static bool allCashCollected = false;
 
     private void Awake()
     {
@@ -31,6 +32,7 @@ public class ThiefManager : MonoBehaviour
     public void AddCash()
     {
         totalCash++;
+        allCashCollected = totalCash >= CashManager.cashes;
         Debug.Log("Cash Collected: " + totalCash);
     }
 }

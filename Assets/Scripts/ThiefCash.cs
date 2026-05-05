@@ -18,6 +18,9 @@ public class ThiefCash : MonoBehaviour
 
     private Pathfinding pathfinding;
 
+    private float cashSearchCooldown = 0.3f;
+    private float cashSearchTimer = 0f;
+
     public enum ThiefState
     {
         Seek,
@@ -32,7 +35,7 @@ public class ThiefCash : MonoBehaviour
     public float cashDetecRange = 5f;
     public float fleeRange = 2f;
 
-    public bool goToExit = false;
+    private bool goToExit => ThiefManager.allCashCollected;
 
 
     void Start()
@@ -40,10 +43,10 @@ public class ThiefCash : MonoBehaviour
         pathfinding = FindFirstObjectByType<Pathfinding>();
         ThiefManager.Instance.RegisterThief();
     }
+
     Transform GetClosestCash()
     {
         GameObject[] allCash = GameObject.FindGameObjectsWithTag("Cash");
-        Debug.Log("All cash: " + allCash.Length);
 
         float minDist = Mathf.Infinity;
         Transform nearest = null;
@@ -54,7 +57,6 @@ public class ThiefCash : MonoBehaviour
 
             float dist = Vector2.Distance(transform.position, cash.transform.position);
 
-            // Optional: skip cash yang terlalu jauh dari detection range
             if (dist > cashDetecRange) continue;
 
             List<Node> testPath = pathfinding.FindPath(transform.position, cash.transform.position);
@@ -72,53 +74,58 @@ public class ThiefCash : MonoBehaviour
             }
         }
 
-        Debug.Log("Nearest reachable cash: " + nearest);
         return nearest;
     }
 
     void Update()
     {
         float distToPolice = Vector3.Distance(transform.position, police.position);
-        float distToExit = Vector3.Distance(transform.position, exitTarget.position);
 
-        cashTarget = GetClosestCash();
-
-        float distToCash = Mathf.Infinity;
-
-        if (cashTarget != null)
+        cashSearchTimer -= Time.deltaTime;
+        if (cashSearchTimer <= 0f)
         {
-            distToCash = Vector2.Distance(transform.position, cashTarget.position);
-        } 
+            cashSearchTimer = cashSearchCooldown;
 
-        if (goToExit)
+            if (cashTarget == null || !cashTarget.gameObject.activeInHierarchy)
+            {
+                cashTarget = GetClosestCash();
+                lastCashTarget = null; 
+            }
+        }
+
+        float distToCash = cashTarget != null
+            ? Vector2.Distance(transform.position, cashTarget.position)
+            : Mathf.Infinity;
+
+        ThiefState nextState;
+
+        if (distToPolice < fleeRange)
         {
-            currentState = ThiefState.Seek;
+            nextState = ThiefState.Flee;
+        }
+        else if (goToExit)
+        {
+            nextState = ThiefState.Seek;
+        }
+        else if (cashTarget != null && distToCash < cashDetecRange)
+        {
+            nextState = ThiefState.SeekCash;
         }
         else
         {
-            if (distToPolice < fleeRange)
-            {
-                currentState = ThiefState.Flee;
-            }
-            else if (cashTarget != null && distToCash < cashDetecRange)
-            {
-                currentState = ThiefState.SeekCash;
-            }
-            else if (distToExit < detectionRange)
-            {
-                currentState = ThiefState.Seek;
-            }
-            else
-            {
-                currentState = ThiefState.Wander;
-            }
+            nextState = ThiefState.Wander;
         }
 
-        if (currentState != previousState)
+        if (nextState != previousState)
         {
+            currentState = nextState;
             currentPath = null;
             pathIndex = 0;
             previousState = currentState;
+        }
+        else
+        {
+            currentState = nextState;
         }
 
         switch (currentState)
@@ -136,6 +143,11 @@ public class ThiefCash : MonoBehaviour
                 break;
 
             case ThiefState.SeekCash:
+                if (cashTarget == null)
+                {
+                    currentState = ThiefState.Wander;
+                    break;
+                }
                 SeekCash();
                 break;
         }
@@ -192,12 +204,7 @@ public class ThiefCash : MonoBehaviour
             if (currentPath == null || currentPath.Count == 0)
             {
                 Debug.LogWarning("Path ke exit gagal dibuat! Posisi thief: "
-                + transform.position + " | Posisi exitTarget: " + exitTarget.position
-                + " | Exit name: " + exitTarget.name);
-            }
-            else
-            {
-                Debug.Log("Path ke exit berhasil. Jumlah node: " + currentPath.Count);
+                + transform.position + " | Posisi exitTarget: " + exitTarget.position);
             }
         }
     }
@@ -229,15 +236,10 @@ public class ThiefCash : MonoBehaviour
             if (currentPath == null || currentPath.Count == 0)
             {
                 Debug.LogWarning("Path ke cash gagal dibuat: " + cashTarget.name);
-
                 cashTarget = null;
                 lastCashTarget = null;
                 currentState = ThiefState.Wander;
                 return;
-            }
-            else
-            {
-                Debug.Log("Path ke cash berhasil. Jumlah node: " + currentPath.Count);
             }
         }
     }
@@ -250,11 +252,9 @@ public class ThiefCash : MonoBehaviour
         if (police == null) return;
 
         Vector3 desiredDir = (transform.position - police.position).normalized;
-
         Vector3 finalDir = GetAvoidDirection(desiredDir, 1.2f, 16);
 
         float fleeSpeed = moveSpeed * fleeSpeedMultiplier;
-
         transform.position += finalDir * fleeSpeed * Time.deltaTime;
 
         currentPath = null;
@@ -280,7 +280,6 @@ public class ThiefCash : MonoBehaviour
     void GenerateNewWanderPath()
     {
         GridBlock grid = FindFirstObjectByType<GridBlock>();
-
         Node randomNode = grid.GetRandomWalkableNode(transform.position, 4f);
 
         if (randomNode != null)
@@ -291,11 +290,11 @@ public class ThiefCash : MonoBehaviour
     }
 
     // =========================
-    // EXIT DETECTION
+    // EXIT / CASH DETECTION
     // =========================
     private void OnTriggerEnter2D(Collider2D other)
     {
-        if (other.CompareTag("Exit")&& goToExit)
+        if (other.CompareTag("Exit") && goToExit)
         {
             ThiefManager.Instance.AddEscape();
             Destroy(gameObject);
@@ -303,15 +302,13 @@ public class ThiefCash : MonoBehaviour
         if (other.CompareTag("Cash"))
         {
             ThiefManager.Instance.AddCash();
-
             Destroy(other.gameObject);
 
             currentPath = null;
             pathIndex = 0;
             cashTarget = null;
             lastCashTarget = null;
-
-            goToExit = ThiefManager.totalCash >= CashManager.cashes;
+            cashSearchTimer = 0f; // langsung cari cash berikutnya
 
             Debug.Log("Cash stolen: " + ThiefManager.totalCash + "/" + CashManager.cashes);
             Debug.Log("Go to exit: " + goToExit);
@@ -326,7 +323,6 @@ public class ThiefCash : MonoBehaviour
         if (currentPath == null) return;
 
         Gizmos.color = Color.black;
-
         foreach (Node n in currentPath)
         {
             Gizmos.DrawCube(n.worldPosition, Vector3.one * 0.3f);
