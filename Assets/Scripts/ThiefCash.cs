@@ -108,9 +108,7 @@ public class ThiefCash : MonoBehaviour
     {
         float distToPolice = Vector3.Distance(transform.position, police.position);
         // jika cashTarget tidak null, hitung jarak. Kalau null, anggap sangat jauh
-        float distToCash = cashTarget != null
-            ? Vector2.Distance(transform.position, cashTarget.position)
-            : Mathf.Infinity;
+        float distToCash = cashTarget != null? Vector2.Distance(transform.position, cashTarget.position): Mathf.Infinity;
 
         if (distToPolice < fleeRange)
             return ThiefState.Flee;

@@ -29,6 +29,7 @@ public class PlayerMove : MonoBehaviour
         {
             //kalau sedang auto-path ke exit, input player diabaikan supaya tidak bertabrakan dengan FollowPath()
             moveSpeed = 2f;
+            rb.linearVelocity = Vector2.zero;
             FollowPath();
         }
         else
@@ -92,7 +93,7 @@ public class PlayerMove : MonoBehaviour
         
         //tambah steering di sini
         Vector3 desiredDir = (targetPos - transform.position).normalized;
-        Vector3 finalDir = GetAvoidDirection(desiredDir); // rayLength pendek, rayCount sedikit
+        Vector3 finalDir = GetAvoidDirection(desiredDir, 0.3f, 8); // rayLength pendek, rayCount sedikit
 
         transform.position += finalDir * moveSpeed * Time.deltaTime;
 

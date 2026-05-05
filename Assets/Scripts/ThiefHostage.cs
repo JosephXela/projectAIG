@@ -48,7 +48,6 @@ public class ThiefHostage : MonoBehaviour
         float distToPolice = Vector3.Distance(transform.position, police.position);
         float distToExit = Vector3.Distance(transform.position, exitTarget.position);
 
-        ThiefState nextState;
 
         if (distToPolice < fleeRange)
         {
