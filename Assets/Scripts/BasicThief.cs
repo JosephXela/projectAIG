@@ -150,6 +150,7 @@ public class BasicThief : MonoBehaviour
         {
             ThiefManager.Instance.AddEscape();
             Destroy(gameObject);
+
         }
     }
 

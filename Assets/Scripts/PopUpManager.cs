@@ -2,13 +2,26 @@ using UnityEngine;
 
 public class PopUpManager : MonoBehaviour
 {
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
+
+
+    public GameObject gameOverPopup;
     void Start()
     {
-        
+        gameOverPopup.SetActive(false);
     }
 
-    // Update is called once per frame
+    public void ShowGameOverPopup()
+    {
+        gameOverPopup.SetActive(true);
+        Time.timeScale = 0f;
+    }
+
+    public void HideGameOverPopup()
+    {
+        gameOverPopup.SetActive(false);
+        Time.timeScale = 1f;
+    }
+
     void Update()
     {
         
