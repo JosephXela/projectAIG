@@ -2643,16 +2643,17 @@ MonoBehaviour:
   m_GameObject: {fileID: 496072343}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0d6379f3c1fd0e140bf306acc9673ecd, type: 3}
+  m_Script: {fileID: 11500000, guid: 3ed09e35ed5de474c91d93e92a5f0f49, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   exitTarget: {fileID: 931824931}
   police: {fileID: 1114201121}
-  moveSpeed: 1
-  fleeSpeedMultiplier: 1.8
-  currentState: 2
+  moveSpeed: 3
+  fleeSpeedMultiplier: 2
   detectionRange: 5
   fleeRange: 2
+  pathIndex: 0
+  pathfinding: {fileID: 0}
 --- !u!1 &519420028
 GameObject:
   m_ObjectHideFlags: 0
@@ -5373,7 +5374,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!212 &1106609651
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -5440,7 +5441,7 @@ Transform:
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: -0.7, y: -1.06, z: 0}
   m_LocalScale: {x: 1.5, y: 1.5, z: 1.5}
-  m_ConstrainProportionsScale: 0
+  m_ConstrainProportionsScale: 1
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -6167,7 +6168,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!212 &1143472372
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -6234,7 +6235,7 @@ Transform:
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: -3.36, y: -1.22, z: 0}
   m_LocalScale: {x: 2, y: 2, z: 2}
-  m_ConstrainProportionsScale: 0
+  m_ConstrainProportionsScale: 1
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -6314,7 +6315,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!212 &1164030271
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -6381,7 +6382,7 @@ Transform:
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 2.05, y: 3.59, z: 0}
   m_LocalScale: {x: 2, y: 2, z: 2}
-  m_ConstrainProportionsScale: 0
+  m_ConstrainProportionsScale: 1
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -7979,7 +7980,7 @@ GameObject:
   - component: {fileID: 1429331035}
   - component: {fileID: 1429331037}
   - component: {fileID: 1429331039}
-  - component: {fileID: 1429331038}
+  - component: {fileID: 1429331040}
   m_Layer: 0
   m_Name: BasicThief
   m_TagString: Thief
@@ -8084,25 +8085,6 @@ Rigidbody2D:
   m_SleepingMode: 1
   m_CollisionDetection: 0
   m_Constraints: 4
---- !u!114 &1429331038
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1429331034}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0d6379f3c1fd0e140bf306acc9673ecd, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  exitTarget: {fileID: 931824931}
-  police: {fileID: 1114201121}
-  moveSpeed: 1
-  fleeSpeedMultiplier: 1.8
-  currentState: 2
-  detectionRange: 5
-  fleeRange: 2
 --- !u!61 &1429331039
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -8149,6 +8131,26 @@ BoxCollider2D:
   m_AutoTiling: 0
   m_Size: {x: 0.14, y: 0.26}
   m_EdgeRadius: 0
+--- !u!114 &1429331040
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1429331034}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3ed09e35ed5de474c91d93e92a5f0f49, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  exitTarget: {fileID: 931824931}
+  police: {fileID: 1114201121}
+  moveSpeed: 3
+  fleeSpeedMultiplier: 2
+  detectionRange: 5
+  fleeRange: 2
+  pathIndex: 0
+  pathfinding: {fileID: 0}
 --- !u!1 &1436763838
 GameObject:
   m_ObjectHideFlags: 0
