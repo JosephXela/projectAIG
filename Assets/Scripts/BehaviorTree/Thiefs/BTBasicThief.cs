@@ -14,6 +14,12 @@ public class BTBasicThief : MonoBehaviour
     [Header("Detection")]
     public float detectionRange = 5f;
     public float fleeRange = 2f;
+//sensor hearing
+    [Header("Hearing")]
+    public float hearingRange = 6f;
+
+    [HideInInspector]
+    public bool heardPolice;
 
     [HideInInspector] public List<Node> currentPath;
     [HideInInspector] public int pathIndex;

@@ -16,6 +16,19 @@ public class PoliceVisibleNode : BTNode
         this.range = range;
     }
 
+    //public override NodeState Evaluate()
+    //{
+    //    float distance =
+    //        Vector3.Distance(
+    //            police.position,
+    //            thief.position);
+
+    //    return distance <= range
+    //        ? NodeState.SUCCESS
+    //        : NodeState.FAILURE;
+    //}
+
+    //dibawah untuk sight cone
     public override NodeState Evaluate()
     {
         float distance =
@@ -23,7 +36,18 @@ public class PoliceVisibleNode : BTNode
                 police.position,
                 thief.position);
 
-        return distance <= range
+        if (distance > range)
+            return NodeState.FAILURE;
+
+        Vector3 dirToPolice =
+            (police.position - thief.position).normalized;
+
+        float angle =
+            Vector3.Angle(
+                thief.up,
+                dirToPolice);
+
+        return angle <= 45f
             ? NodeState.SUCCESS
             : NodeState.FAILURE;
     }
