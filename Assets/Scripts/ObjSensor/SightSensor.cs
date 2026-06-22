@@ -1,9 +1,9 @@
 using System.Collections;
 using UnityEngine;
 
-public class VisionSensor : MonoBehaviour
+public class SightSensor : MonoBehaviour
 {
-    [Header("Vision Settings")]
+    [Header("Sight Settings")]
     public float radius = 5f;
     [Range(0, 360)]
     public float angle = 90f;

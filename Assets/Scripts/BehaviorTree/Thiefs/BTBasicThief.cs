@@ -16,7 +16,7 @@ public class BTBasicThief : MonoBehaviour
     public float fleeRange = 2f;
 
     [Header("Sensors")]
-    public VisionSensor visionSensor;
+    public SightSensor sightSensor;
     public HearingSensor hearingSensor;
 
     [HideInInspector]
@@ -27,7 +27,7 @@ public class BTBasicThief : MonoBehaviour
 
     [HideInInspector] public Pathfinding pathfinding;
 
-    // Arah gerak terakhir, dipakai sebagai "facing direction" untuk VisionSensor
+    // Arah gerak terakhir, dipakai sebagai "facing direction" untuk SightSensor
     private Vector2 lastMoveDir = Vector2.right;
 
     private BTNode topNode;
@@ -36,8 +36,8 @@ public class BTBasicThief : MonoBehaviour
     {
         pathfinding = FindFirstObjectByType<Pathfinding>();
 
-        if (visionSensor == null)
-            visionSensor = GetComponent<VisionSensor>();
+        if (sightSensor == null)
+            sightSensor = GetComponent<SightSensor>();
         if (hearingSensor == null)
             hearingSensor = GetComponent<HearingSensor>();
 
@@ -48,7 +48,7 @@ public class BTBasicThief : MonoBehaviour
 
     private void ConstructBehaviourTree()
     {
-        // PoliceVisibleNode sekarang dibaca dari hasil VisionSensor,
+        // PoliceVisibleNode sekarang dibaca dari hasil SightSensor,
         // bukan menghitung jarak/LOS sendiri. Lihat versi baru PoliceVisibleNode.
         PoliceVisibleNode policeVisible =
             new PoliceVisibleNode(this, fleeRange);
@@ -105,10 +105,10 @@ public class BTBasicThief : MonoBehaviour
 
     private void UpdateSensorReadings()
     {
-        // Vision sensor butuh tahu arah hadap thief untuk FOV check.
-        if (visionSensor != null)
+        // Sight sensor butuh tahu arah hadap thief untuk FOV check.
+        if (sightSensor != null)
         {
-            visionSensor.facingDirection = lastMoveDir;
+            sightSensor.facingDirection = lastMoveDir;
         }
 
         // heardPolice diisi dari HearingSensor, dipakai node lain jika perlu
@@ -127,8 +127,8 @@ public class BTBasicThief : MonoBehaviour
 
     public bool IsPoliceSensed()
     {
-        // True kalau kelihatan (vision) ATAU kedengaran (hearing).
-        bool seen = visionSensor != null && visionSensor.targetSensed;
+        // True kalau kelihatan (sight) ATAU kedengaran (hearing).
+        bool seen = sightSensor != null && sightSensor.targetSensed;
         bool heard = hearingSensor != null && hearingSensor.targetHeard;
         return seen || heard;
     }

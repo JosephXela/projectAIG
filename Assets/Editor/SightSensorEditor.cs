@@ -1,12 +1,12 @@
 using UnityEngine;
 using UnityEditor;
 
-[CustomEditor(typeof(VisionSensor))]
-public class VisionSensorEditor : Editor
+[CustomEditor(typeof(SightSensor))]
+public class SightSensorEditor : Editor
 {
     public void OnSceneGUI()
     {
-        VisionSensor sense = (VisionSensor)target;
+        SightSensor sense = (SightSensor)target;
         Handles.color = Color.white;
 
         // Lingkaran radius, normal mengarah ke kamera (sumbu Z) supaya terlihat di plane XY
@@ -18,7 +18,7 @@ public class VisionSensorEditor : Editor
             sense.radius);
 
         // Arah hadap diambil dari facingDirection (arah gerak terakhir thief),
-        // bukan dari rotasi transform, karena VisionSensor 2D top-down
+        // bukan dari rotasi transform, karena SightSensor 2D top-down
         // umumnya tidak merotasi GameObject-nya.
         float facingAngleDeg =
             Mathf.Atan2(sense.facingDirection.y, sense.facingDirection.x) * Mathf.Rad2Deg;
