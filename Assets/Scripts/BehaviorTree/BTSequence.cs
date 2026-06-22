@@ -4,30 +4,30 @@ using UnityEngine;
 public class BTSequence : BTNode
 {
     protected List<BTNode> nodes = new List<BTNode>();
+
     public BTSequence(List<BTNode> nodes)
     {
         this.nodes = nodes;
     }
+
     public override NodeState Evaluate()
     {
-        bool isAnyNodeRunning = false;
         foreach (var node in nodes)
         {
             switch (node.Evaluate())
             {
                 case NodeState.RUNNING:
-                    isAnyNodeRunning = true;
-                    break;
+                    nodeState_ = NodeState.RUNNING;
+                    return nodeState_;
                 case NodeState.SUCCESS:
-                    break;
+                    continue;
                 case NodeState.FAILURE:
                     nodeState_ = NodeState.FAILURE;
-                    break;
-                default:
-                    break;
+                    return nodeState_;
             }
         }
-        nodeState_ = isAnyNodeRunning ? NodeState.RUNNING : NodeState.SUCCESS;
+
+        nodeState_ = NodeState.SUCCESS;
         return nodeState_;
     }
 }

@@ -29,7 +29,6 @@ public class WanderNode : BTNode
                     thief.pathfinding.FindPath(
                         thief.transform.position,
                         randomNode.worldPosition);
-
                 thief.pathIndex = 0;
             }
         }

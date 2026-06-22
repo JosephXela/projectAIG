@@ -34,7 +34,10 @@ public class FleeNode : BTNode
             fleeSpeed *
             Time.deltaTime;
 
+        thief.UpdateLastMoveDir(finalDir);
+
         thief.currentPath = null;
+        thief.pathIndex = 0;
 
         return NodeState.RUNNING;
     }

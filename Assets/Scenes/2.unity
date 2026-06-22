@@ -624,7 +624,7 @@ Transform:
   m_GameObject: {fileID: 121755035}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 9.86, y: 1.56, z: 0.024724307}
+  m_LocalPosition: {x: 9.86, y: 1.55, z: 0.024724307}
   m_LocalScale: {x: 0.1, y: 1.5512526, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -1426,7 +1426,7 @@ Transform:
   m_GameObject: {fileID: 228962726}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 9.85, y: 3.6451, z: 0.024724307}
+  m_LocalPosition: {x: 9.843, y: 3.6451, z: 0.024724307}
   m_LocalScale: {x: 0.1, y: 0.77810186, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -2364,8 +2364,8 @@ Transform:
   m_GameObject: {fileID: 492134754}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0.7071068, w: 0.7071068}
-  m_LocalPosition: {x: 10.5, y: -0.88, z: 0.024724307}
-  m_LocalScale: {x: 0.1, y: 1.3015037, z: 1.0849}
+  m_LocalPosition: {x: 10.5, y: -0.92, z: 0.024724307}
+  m_LocalScale: {x: 0.1, y: 1.3145187, z: 1.0849}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1336772798}
@@ -2484,6 +2484,8 @@ GameObject:
   - component: {fileID: 496072346}
   - component: {fileID: 496072347}
   - component: {fileID: 496072348}
+  - component: {fileID: 496072350}
+  - component: {fileID: 496072349}
   m_Layer: 0
   m_Name: BasicThief (1)
   m_TagString: Thief
@@ -2648,12 +2650,56 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   exitTarget: {fileID: 931824931}
   police: {fileID: 1114201121}
-  moveSpeed: 3
+  moveSpeed: 1
   fleeSpeedMultiplier: 2
   detectionRange: 5
   fleeRange: 2
+  visionSensor: {fileID: 0}
+  hearingSensor: {fileID: 0}
+  heardPolice: 0
   pathIndex: 0
   pathfinding: {fileID: 0}
+--- !u!114 &496072349
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 496072343}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3c0a8931788a57c4ab1afcb244496a60, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  radius: 1
+  angle: 90
+  targetGO: {fileID: 0}
+  targetMask:
+    serializedVersion: 2
+    m_Bits: 128
+  obstacleMask:
+    serializedVersion: 2
+    m_Bits: 64
+  facingDirection: {x: 1, y: 0}
+  targetSensed: 0
+--- !u!114 &496072350
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 496072343}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 77d966493c90d6e40a444501287ccba5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  radius: 1.5
+  targetGO: {fileID: 0}
+  targetMask:
+    serializedVersion: 2
+    m_Bits: 128
+  targetHeard: 0
 --- !u!1 &519420028
 GameObject:
   m_ObjectHideFlags: 0
@@ -5820,7 +5866,7 @@ GameObject:
   - component: {fileID: 1114201123}
   - component: {fileID: 1114201122}
   - component: {fileID: 1114201125}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Player
   m_TagString: Player
   m_Icon: {fileID: 0}
@@ -5891,7 +5937,7 @@ Transform:
   m_GameObject: {fileID: 1114201119}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.71, y: -4.63, z: 0}
+  m_LocalPosition: {x: 0.67, y: -4.64, z: 0}
   m_LocalScale: {x: 1.5, y: 1.5, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -7981,6 +8027,8 @@ GameObject:
   - component: {fileID: 1429331037}
   - component: {fileID: 1429331039}
   - component: {fileID: 1429331040}
+  - component: {fileID: 1429331042}
+  - component: {fileID: 1429331041}
   m_Layer: 0
   m_Name: BasicThief
   m_TagString: Thief
@@ -8145,12 +8193,56 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   exitTarget: {fileID: 931824931}
   police: {fileID: 1114201121}
-  moveSpeed: 3
-  fleeSpeedMultiplier: 2
+  moveSpeed: 1
+  fleeSpeedMultiplier: 1.5
   detectionRange: 5
   fleeRange: 2
+  visionSensor: {fileID: 0}
+  hearingSensor: {fileID: 0}
+  heardPolice: 0
   pathIndex: 0
   pathfinding: {fileID: 0}
+--- !u!114 &1429331041
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1429331034}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 77d966493c90d6e40a444501287ccba5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  radius: 1.5
+  targetGO: {fileID: 0}
+  targetMask:
+    serializedVersion: 2
+    m_Bits: 128
+  targetHeard: 0
+--- !u!114 &1429331042
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1429331034}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3c0a8931788a57c4ab1afcb244496a60, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  radius: 1
+  angle: 80
+  targetGO: {fileID: 0}
+  targetMask:
+    serializedVersion: 2
+    m_Bits: 128
+  obstacleMask:
+    serializedVersion: 2
+    m_Bits: 64
+  facingDirection: {x: 1, y: 0}
+  targetSensed: 0
 --- !u!1 &1436763838
 GameObject:
   m_ObjectHideFlags: 0

@@ -14,9 +14,10 @@ public class BTBasicThief : MonoBehaviour
     [Header("Detection")]
     public float detectionRange = 5f;
     public float fleeRange = 2f;
-//sensor hearing
-    [Header("Hearing")]
-    public float hearingRange = 6f;
+
+    [Header("Sensors")]
+    public VisionSensor visionSensor;
+    public HearingSensor hearingSensor;
 
     [HideInInspector]
     public bool heardPolice;
@@ -26,11 +27,19 @@ public class BTBasicThief : MonoBehaviour
 
     [HideInInspector] public Pathfinding pathfinding;
 
+    // Arah gerak terakhir, dipakai sebagai "facing direction" untuk VisionSensor
+    private Vector2 lastMoveDir = Vector2.right;
+
     private BTNode topNode;
 
     private void Start()
     {
         pathfinding = FindFirstObjectByType<Pathfinding>();
+
+        if (visionSensor == null)
+            visionSensor = GetComponent<VisionSensor>();
+        if (hearingSensor == null)
+            hearingSensor = GetComponent<HearingSensor>();
 
         ThiefManager.Instance.RegisterThief();
 
@@ -39,11 +48,10 @@ public class BTBasicThief : MonoBehaviour
 
     private void ConstructBehaviourTree()
     {
+        // PoliceVisibleNode sekarang dibaca dari hasil VisionSensor,
+        // bukan menghitung jarak/LOS sendiri. Lihat versi baru PoliceVisibleNode.
         PoliceVisibleNode policeVisible =
-            new PoliceVisibleNode(
-                police,
-                transform,
-                fleeRange);
+            new PoliceVisibleNode(this, fleeRange);
 
         ExitNearbyNode exitNearby =
             new ExitNearbyNode(
@@ -88,9 +96,41 @@ public class BTBasicThief : MonoBehaviour
 
     private void Update()
     {
+        UpdateSensorReadings();
+
         topNode.Evaluate();
 
         FollowPath();
+    }
+
+    private void UpdateSensorReadings()
+    {
+        // Vision sensor butuh tahu arah hadap thief untuk FOV check.
+        if (visionSensor != null)
+        {
+            visionSensor.facingDirection = lastMoveDir;
+        }
+
+        // heardPolice diisi dari HearingSensor, dipakai node lain jika perlu
+        // (misal untuk Wander yang lebih waspada, atau debug).
+        if (hearingSensor != null)
+        {
+            heardPolice = hearingSensor.targetHeard;
+        }
+    }
+
+    public void UpdateLastMoveDir(Vector3 dir)
+    {
+        if (dir.sqrMagnitude > 0.0001f)
+            lastMoveDir = dir;
+    }
+
+    public bool IsPoliceSensed()
+    {
+        // True kalau kelihatan (vision) ATAU kedengaran (hearing).
+        bool seen = visionSensor != null && visionSensor.targetSensed;
+        bool heard = hearingSensor != null && hearingSensor.targetHeard;
+        return seen || heard;
     }
 
     public void FollowPath()
@@ -119,6 +159,9 @@ public class BTBasicThief : MonoBehaviour
             finalDir *
             moveSpeed *
             Time.deltaTime;
+
+        if (finalDir.sqrMagnitude > 0.0001f)
+            lastMoveDir = finalDir;
 
         if (Vector3.Distance(
             transform.position,

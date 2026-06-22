@@ -2,53 +2,47 @@ using UnityEngine;
 
 public class PoliceVisibleNode : BTNode
 {
-    private Transform police;
-    private Transform thief;
-    private float range;
+    private BTBasicThief thief;
+    private float fleeRange;
+    private bool isFleeing;
 
-    public PoliceVisibleNode(
-        Transform police,
-        Transform thief,
-        float range)
+    // Jarak tambahan sebelum thief berhenti flee (hysteresis),
+    // mencegah flicker saat police pas di garis batas fleeRange.
+    private const float exitBuffer = 1.5f;
+
+    public PoliceVisibleNode(BTBasicThief thief, float fleeRange)
     {
-        this.police = police;
         this.thief = thief;
-        this.range = range;
+        this.fleeRange = fleeRange;
     }
 
-    //public override NodeState Evaluate()
-    //{
-    //    float distance =
-    //        Vector3.Distance(
-    //            police.position,
-    //            thief.position);
-
-    //    return distance <= range
-    //        ? NodeState.SUCCESS
-    //        : NodeState.FAILURE;
-    //}
-
-    //dibawah untuk sight cone
     public override NodeState Evaluate()
     {
-        float distance =
-            Vector3.Distance(
-                police.position,
-                thief.position);
-
-        if (distance > range)
+        if (thief.police == null)
             return NodeState.FAILURE;
 
-        Vector3 dirToPolice =
-            (police.position - thief.position).normalized;
+        // Sensor adalah sumber kebenaran utama: police harus
+        // benar-benar tersensor (vision ATAU hearing) dulu.
+        bool sensed = thief.IsPoliceSensed();
 
-        float angle =
-            Vector3.Angle(
-                thief.up,
-                dirToPolice);
+        if (!sensed)
+        {
+            isFleeing = false;
+            return NodeState.FAILURE;
+        }
 
-        return angle <= 45f
-            ? NodeState.SUCCESS
-            : NodeState.FAILURE;
+        float distance =
+            Vector3.Distance(thief.police.position, thief.transform.position);
+
+        if (isFleeing)
+        {
+            isFleeing = distance <= fleeRange + exitBuffer;
+        }
+        else
+        {
+            isFleeing = distance <= fleeRange;
+        }
+
+        return isFleeing ? NodeState.SUCCESS : NodeState.FAILURE;
     }
 }
