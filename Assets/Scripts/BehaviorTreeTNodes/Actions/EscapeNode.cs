@@ -2,28 +2,28 @@ using UnityEngine;
 
 public class EscapeNode : BTNode
 {
-    private BTBasicThief thief;
+    private ThiefController thief;
 
-    public EscapeNode(BTBasicThief thief)
+    public EscapeNode(ThiefController thief)
     {
         this.thief = thief;
     }
 
     public override NodeState Evaluate()
     {
-        if (thief.exitTarget == null)
+        if (thief.ExitTarget == null)
             return NodeState.FAILURE;
 
-        if (thief.currentPath == null ||
-            thief.currentPath.Count == 0 ||
-            thief.pathIndex >= thief.currentPath.Count)
+        if (thief.CurrentPath == null ||
+            thief.CurrentPath.Count == 0 ||
+            thief.PathIndex >= thief.CurrentPath.Count)
         {
-            thief.currentPath =
-                thief.pathfinding.FindPath(
-                    thief.transform.position,
-                    thief.exitTarget.position);
+            thief.CurrentPath =
+                thief.Pathfinding.FindPath(
+                    thief.SelfTransform.position,
+                    thief.ExitTarget.position);
 
-            thief.pathIndex = 0;
+            thief.PathIndex = 0;
         }
 
         return NodeState.RUNNING;

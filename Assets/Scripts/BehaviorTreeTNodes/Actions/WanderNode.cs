@@ -2,34 +2,34 @@ using UnityEngine;
 
 public class WanderNode : BTNode
 {
-    private BTBasicThief thief;
+    private ThiefController thief;
 
-    public WanderNode(BTBasicThief thief)
+    public WanderNode(ThiefController thief)
     {
         this.thief = thief;
     }
 
     public override NodeState Evaluate()
     {
-        if (thief.currentPath == null ||
-            thief.currentPath.Count == 0 ||
-            thief.pathIndex >= thief.currentPath.Count)
+        if (thief.CurrentPath == null ||
+            thief.CurrentPath.Count == 0 ||
+            thief.PathIndex >= thief.CurrentPath.Count)
         {
             GridBlock grid =
                 Object.FindFirstObjectByType<GridBlock>();
 
             Node randomNode =
                 grid.GetRandomWalkableNode(
-                    thief.transform.position,
+                    thief.SelfTransform.position,
                     4f);
 
             if (randomNode != null)
             {
-                thief.currentPath =
-                    thief.pathfinding.FindPath(
-                        thief.transform.position,
+                thief.CurrentPath =
+                    thief.Pathfinding.FindPath(
+                        thief.SelfTransform.position,
                         randomNode.worldPosition);
-                thief.pathIndex = 0;
+                thief.PathIndex = 0;
             }
         }
 

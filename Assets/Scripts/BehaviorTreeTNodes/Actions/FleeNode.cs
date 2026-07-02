@@ -2,21 +2,21 @@ using UnityEngine;
 
 public class FleeNode : BTNode
 {
-    private BTBasicThief thief;
+    private ThiefController thief;
 
-    public FleeNode(BTBasicThief thief)
+    public FleeNode(ThiefController thief)
     {
         this.thief = thief;
     }
 
     public override NodeState Evaluate()
     {
-        if (thief.police == null)
+        if (thief.Police == null)
             return NodeState.FAILURE;
 
         Vector3 desiredDir =
-            (thief.transform.position -
-             thief.police.position)
+            (thief.SelfTransform.position -
+             thief.Police.position)
             .normalized;
 
         Vector3 finalDir =
@@ -26,18 +26,18 @@ public class FleeNode : BTNode
                 16);
 
         float fleeSpeed =
-            thief.moveSpeed *
-            thief.fleeSpeedMultiplier;
+            thief.MoveSpeed *
+            thief.FleeSpeedMultiplier;
 
-        thief.transform.position +=
+        thief.SelfTransform.position +=
             finalDir *
             fleeSpeed *
             Time.deltaTime;
 
         thief.UpdateLastMoveDir(finalDir);
 
-        thief.currentPath = null;
-        thief.pathIndex = 0;
+        thief.CurrentPath = null;
+        thief.PathIndex = 0;
 
         return NodeState.RUNNING;
     }

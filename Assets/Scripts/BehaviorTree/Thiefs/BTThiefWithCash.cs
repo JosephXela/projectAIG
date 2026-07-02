@@ -1,7 +1,7 @@
 using UnityEngine;
 using System.Collections.Generic;
 
-public class BTBasicThief : MonoBehaviour, ThiefController
+public class BTThiefWithCash : MonoBehaviour, ThiefCashController
 {
     [Header("References")]
     public Transform exitTarget;
@@ -13,6 +13,7 @@ public class BTBasicThief : MonoBehaviour, ThiefController
 
     [Header("Detection")]
     public float detectionRange = 5f;
+    public float cashDetecRange = 5f;
     public float fleeRange = 2f;
 
     [Header("Sensors")]
@@ -20,6 +21,13 @@ public class BTBasicThief : MonoBehaviour, ThiefController
     public HearingSensor hearingSensor;
 
     [HideInInspector] public bool heardPolice;
+    [HideInInspector] public Transform cashTarget;
+    [HideInInspector] public Transform lastCashTarget;
+
+
+    private float cashSearchCooldown = 0.3f;
+    private float cashSearchTimer = 0f;
+
     [HideInInspector] public List<Node> currentPath;
     [HideInInspector] public int pathIndex;
     [HideInInspector] public Pathfinding pathfinding;
@@ -36,6 +44,8 @@ public class BTBasicThief : MonoBehaviour, ThiefController
     public Pathfinding Pathfinding => pathfinding;
     public float MoveSpeed => moveSpeed;
     public float FleeSpeedMultiplier => fleeSpeedMultiplier;
+    public bool GoToExit => ThiefManager.allCashCollected;
+    public Transform CashTarget => cashTarget;
 
     public bool IsPoliceSensed()
     {
@@ -87,26 +97,36 @@ public class BTBasicThief : MonoBehaviour, ThiefController
 
     private void ConstructBehaviourTree()
     {
-        // Semua node menerima IThiefController — tidak perlu cast apapun
+        // Shared nodes — menerima IThiefController, bukan class konkret
         var policeVisible = new PoliceVisibleNode(this, fleeRange);
         var exitNearby = new ExitNearbyNode(this, detectionRange);
         var fleeNode = new FleeNode(this);
         var escapeNode = new EscapeNode(this);
         var wanderNode = new WanderNode(this);
 
+        // Cash-specific nodes — menerima BTThiefWithCash langsung (wajar,
+        // karena node ini memang spesifik untuk thief jenis ini)
+        var hasAllCash = new HasMoneyNode(this);
+        var cashNearby = new MoneyNearbyNode(this);
+        var collectCash = new CollectMoneyNode(this);
+
         var fleeSequence = new BTSequence(new List<BTNode>
             { policeVisible, fleeNode });
 
+        var collectSequence = new BTSequence(new List<BTNode>
+            { new BTInverter(hasAllCash), cashNearby, collectCash });
+
         var escapeSequence = new BTSequence(new List<BTNode>
-            { exitNearby, escapeNode });
+            { hasAllCash, exitNearby, escapeNode });
 
         topNode = new BTSelector(new List<BTNode>
-            { fleeSequence, escapeSequence, wanderNode });
+            { fleeSequence, collectSequence, escapeSequence, wanderNode });
     }
 
     private void Update()
     {
         UpdateSensorReadings();
+        UpdateCashTarget();
         topNode.Evaluate();
         FollowPath();
     }
@@ -115,6 +135,54 @@ public class BTBasicThief : MonoBehaviour, ThiefController
     {
         if (sightSensor != null) sightSensor.facingDirection = lastMoveDir;
         if (hearingSensor != null) heardPolice = hearingSensor.targetHeard;
+    }
+
+    public void UpdateCashTarget()
+    {
+        cashSearchTimer -= Time.deltaTime;
+        if (cashSearchTimer > 0f) return;
+
+        cashSearchTimer = cashSearchCooldown;
+
+        if (cashTarget == null || !cashTarget.gameObject.activeInHierarchy)
+        {
+            cashTarget = GetClosestCash();
+            lastCashTarget = null;
+        }
+    }
+
+    public Transform GetClosestCash()
+    {
+        GameObject[] allCash = GameObject.FindGameObjectsWithTag("Cash");
+
+        float minDist = Mathf.Infinity;
+        Transform nearest = null;
+
+        foreach (GameObject cash in allCash)
+        {
+            if (cash == null) continue;
+
+            float dist = Vector2.Distance(transform.position, cash.transform.position);
+            if (dist > cashDetecRange) continue;
+
+            List<Node> testPath = pathfinding.FindPath(
+                transform.position, cash.transform.position);
+
+            if (testPath == null || testPath.Count == 0) continue;
+
+            if (dist < minDist) { minDist = dist; nearest = cash.transform; }
+        }
+
+        return nearest;
+    }
+
+    public void OnCashCollected()
+    {
+        currentPath = null;
+        pathIndex = 0;
+        cashTarget = null;
+        lastCashTarget = null;
+        cashSearchTimer = 0f;
     }
 
     public void FollowPath()
@@ -131,18 +199,29 @@ public class BTBasicThief : MonoBehaviour, ThiefController
         if (finalDir.sqrMagnitude > 0.0001f)
             lastMoveDir = finalDir;
 
-        if (Vector3.Distance(transform.position, targetPos) < 0.1f)
+        if (Vector3.Distance(transform.position, targetPos) < 0.01f)
             pathIndex++;
     }
 
     private void OnTriggerEnter2D(Collider2D other)
     {
-        if (other.CompareTag("Exit"))
+        if (other.CompareTag("Exit") && GoToExit)
         {
             ThiefManager.Instance.AddEscape();
             Destroy(gameObject);
         }
+
+        if (other.CompareTag("Cash"))
+        {
+            ThiefManager.Instance.AddCash();
+            Destroy(other.gameObject);
+            OnCashCollected();
+
+            Debug.Log("Cash stolen: " + ThiefManager.totalCash + "/" + CashManager.cashes);
+            Debug.Log("Go to exit: " + GoToExit);
+        }
     }
+
     private void OnDrawGizmos()
     {
         if (currentPath == null) return;

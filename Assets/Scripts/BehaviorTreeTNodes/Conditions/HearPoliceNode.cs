@@ -1,42 +1,36 @@
 using UnityEngine;
-//pencuri bisa mendengar hanya jika polisi bergerak
+
+// Condition Node: thief mendengar police HANYA jika police sedang bergerak.
+// Berbeda dari HearingSensor (yang cuma cek radius),
+// node ini tambah syarat: policeRb.linearVelocity > threshold.
 public class HearPoliceNode : BTNode
 {
-    private BTBasicThief thief;
-    private Transform police;
+    private ThiefController thief;
     private float hearingRange;
     private Rigidbody2D policeRb;
 
-    public HearPoliceNode(
-       BTBasicThief thief,
-       Transform police,
-       float hearingRange)
+    public HearPoliceNode(ThiefController thief, float hearingRange)
     {
         this.thief = thief;
-        this.police = police;
         this.hearingRange = hearingRange;
 
-        if (police != null)
-        {
-            policeRb = police.GetComponent<Rigidbody2D>();
-        }
-        
+        if (thief.Police != null)
+            policeRb = thief.Police.GetComponent<Rigidbody2D>();
     }
+
     public override NodeState Evaluate()
     {
-        if (police == null || policeRb == null)
+        if (thief.Police == null || policeRb == null)
             return NodeState.FAILURE;
 
         float distance = Vector2.Distance(
-            thief.transform.position,
-            police.position);
+            thief.SelfTransform.position,
+            thief.Police.position);
 
         float speed = policeRb.linearVelocity.magnitude;
 
         if (distance <= hearingRange && speed > 0.1f)
-        {
             return NodeState.SUCCESS;
-        }
 
         return NodeState.FAILURE;
     }

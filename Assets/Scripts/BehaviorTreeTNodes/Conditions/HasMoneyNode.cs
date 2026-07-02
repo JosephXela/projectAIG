@@ -1,16 +1,16 @@
-using UnityEngine;
-
-public class HasMoneyNode : MonoBehaviour
+public class HasMoneyNode : BTNode
 {
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
+    private ThiefCashController thief;
+
+    public HasMoneyNode(ThiefCashController thief)
     {
-        
+        this.thief = thief;
     }
 
-    // Update is called once per frame
-    void Update()
+    public override NodeState Evaluate()
     {
-        
+        return thief.GoToExit
+            ? NodeState.SUCCESS
+            : NodeState.FAILURE;
     }
 }

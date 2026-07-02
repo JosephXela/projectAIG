@@ -2492,7 +2492,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!212 &496072344
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -2654,7 +2654,7 @@ MonoBehaviour:
   fleeSpeedMultiplier: 2
   detectionRange: 5
   fleeRange: 2
-  visionSensor: {fileID: 0}
+  sightSensor: {fileID: 0}
   hearingSensor: {fileID: 0}
   heardPolice: 0
   pathIndex: 0
@@ -5413,7 +5413,9 @@ GameObject:
   - component: {fileID: 1106609651}
   - component: {fileID: 1106609655}
   - component: {fileID: 1106609654}
-  - component: {fileID: 1106609653}
+  - component: {fileID: 1106609658}
+  - component: {fileID: 1106609657}
+  - component: {fileID: 1106609656}
   m_Layer: 0
   m_Name: ThiefWithCash
   m_TagString: Thief
@@ -5485,32 +5487,12 @@ Transform:
   m_GameObject: {fileID: 1106609650}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -0.7, y: -1.06, z: 0}
+  m_LocalPosition: {x: 0.67, y: 2.36, z: 0}
   m_LocalScale: {x: 1.5, y: 1.5, z: 1.5}
   m_ConstrainProportionsScale: 1
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1106609653
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1106609650}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 835ff9b9276fb3049967c796bdb170de, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  exitTarget: {fileID: 931824931}
-  police: {fileID: 1114201121}
-  moveSpeed: 1
-  fleeSpeedMultiplier: 1.8
-  currentState: 2
-  detectionRange: 5
-  cashDetecRange: 5
-  fleeRange: 2
 --- !u!50 &1106609654
 Rigidbody2D:
   serializedVersion: 5
@@ -5584,6 +5566,73 @@ BoxCollider2D:
   m_AutoTiling: 0
   m_Size: {x: 0.2, y: 0.26}
   m_EdgeRadius: 0
+--- !u!114 &1106609656
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1106609650}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3c0a8931788a57c4ab1afcb244496a60, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  radius: 1
+  angle: 90
+  targetGO: {fileID: 0}
+  targetMask:
+    serializedVersion: 2
+    m_Bits: 128
+  obstacleMask:
+    serializedVersion: 2
+    m_Bits: 64
+  facingDirection: {x: 1, y: 0}
+  targetSensed: 0
+--- !u!114 &1106609657
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1106609650}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 77d966493c90d6e40a444501287ccba5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  radius: 1.5
+  targetGO: {fileID: 0}
+  targetMask:
+    serializedVersion: 2
+    m_Bits: 128
+  targetHeard: 0
+--- !u!114 &1106609658
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1106609650}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3c3590bb1a7f4404bbac3d047c47f325, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  exitTarget: {fileID: 931824931}
+  police: {fileID: 1114201121}
+  moveSpeed: 1
+  fleeSpeedMultiplier: 2
+  detectionRange: 5
+  cashDetecRange: 5
+  fleeRange: 2
+  sightSensor: {fileID: 0}
+  hearingSensor: {fileID: 0}
+  heardPolice: 0
+  cashTarget: {fileID: 0}
+  lastCashTarget: {fileID: 0}
+  pathIndex: 0
+  pathfinding: {fileID: 0}
 --- !u!1 &1110467009
 GameObject:
   m_ObjectHideFlags: 0
@@ -6214,7 +6263,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!212 &1143472372
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -6361,7 +6410,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!212 &1164030271
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -8100,7 +8149,7 @@ Transform:
   m_GameObject: {fileID: 1429331034}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 5.82, y: 1.9, z: 0}
+  m_LocalPosition: {x: 1.71, y: -4.49, z: 0}
   m_LocalScale: {x: 1.5, y: 1.5, z: 1.5}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -8197,7 +8246,7 @@ MonoBehaviour:
   fleeSpeedMultiplier: 1.5
   detectionRange: 5
   fleeRange: 2
-  visionSensor: {fileID: 0}
+  sightSensor: {fileID: 0}
   hearingSensor: {fileID: 0}
   heardPolice: 0
   pathIndex: 0
@@ -8940,8 +8989,8 @@ Transform:
   m_GameObject: {fileID: 1536719744}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 7.22, y: -0.58, z: 0.024724307}
-  m_LocalScale: {x: 0.1, y: 1.1610879, z: 1}
+  m_LocalPosition: {x: 7.22, y: -0.49, z: 0.024724307}
+  m_LocalScale: {x: 0.1, y: 0.8739787, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 139838017}

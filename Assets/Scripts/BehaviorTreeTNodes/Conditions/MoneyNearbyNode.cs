@@ -1,16 +1,18 @@
-using UnityEngine;
-
-public class MoneyNearbyNode : MonoBehaviour
+public class MoneyNearbyNode : BTNode
 {
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
+    private ThiefCashController thief;
+
+    public MoneyNearbyNode(ThiefCashController thief)
     {
-        
+        this.thief = thief;
     }
 
-    // Update is called once per frame
-    void Update()
+    public override NodeState Evaluate()
     {
-        
+        if (thief.CashTarget != null &&
+            thief.CashTarget.gameObject.activeInHierarchy)
+            return NodeState.SUCCESS;
+
+        return NodeState.FAILURE;
     }
 }

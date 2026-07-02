@@ -2,26 +2,23 @@ using UnityEngine;
 
 public class ExitNearbyNode : BTNode
 {
-    private Transform exitTarget;
-    private Transform thief;
+    private ThiefController thief;
     private float range;
 
-    public ExitNearbyNode(
-        Transform exitTarget,
-        Transform thief,
-        float range)
+    public ExitNearbyNode(ThiefController thief, float range)
     {
-        this.exitTarget = exitTarget;
         this.thief = thief;
         this.range = range;
     }
 
     public override NodeState Evaluate()
     {
-        float distance =
-            Vector3.Distance(
-                exitTarget.position,
-                thief.position);
+        if (thief.ExitTarget == null)
+            return NodeState.FAILURE;
+
+        float distance = Vector3.Distance(
+            thief.ExitTarget.position,
+            thief.SelfTransform.position);
 
         return distance <= range
             ? NodeState.SUCCESS
