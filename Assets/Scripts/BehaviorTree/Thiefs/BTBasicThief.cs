@@ -27,7 +27,6 @@ public class BTBasicThief : MonoBehaviour, ThiefController
     private Vector2 lastMoveDir = Vector2.right;
     private BTNode topNode;
 
-    // --- IThiefController implementation ---
     public Transform SelfTransform => transform;
     public Transform Police => police;
     public Transform ExitTarget => exitTarget;
@@ -72,7 +71,6 @@ public class BTBasicThief : MonoBehaviour, ThiefController
 
         return bestDir.normalized;
     }
-    // --- End IThiefController ---
 
     private void Start()
     {
@@ -87,7 +85,6 @@ public class BTBasicThief : MonoBehaviour, ThiefController
 
     private void ConstructBehaviourTree()
     {
-        // Semua node menerima IThiefController — tidak perlu cast apapun
         var policeVisible = new PoliceVisibleNode(this, fleeRange);
         var exitNearby = new ExitNearbyNode(this, detectionRange);
         var fleeNode = new FleeNode(this);

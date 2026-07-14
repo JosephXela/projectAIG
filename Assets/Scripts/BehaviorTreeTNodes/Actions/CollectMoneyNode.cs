@@ -27,8 +27,6 @@ public class CollectMoneyNode : BTNode
             thief.CurrentPath.Count == 0 ||
             thief.PathIndex >= thief.CurrentPath.Count;
 
-        // Path dianggap invalid juga kalau cash target berubah
-        // (misal sebelumnya path menuju wander point, atau cash lain)
         if (!pathInvalid && trackedCashTarget != thief.CashTarget)
         {
             pathInvalid = true;

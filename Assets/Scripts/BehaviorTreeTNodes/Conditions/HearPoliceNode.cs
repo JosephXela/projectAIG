@@ -1,8 +1,4 @@
 using UnityEngine;
-
-// Condition Node: thief mendengar police HANYA jika police sedang bergerak.
-// Berbeda dari HearingSensor (yang cuma cek radius),
-// node ini tambah syarat: policeRb.linearVelocity > threshold.
 public class HearPoliceNode : BTNode
 {
     private ThiefController thief;

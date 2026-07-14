@@ -35,7 +35,6 @@ public class BTThiefWithCash : MonoBehaviour, ThiefCashController
     private Vector2 lastMoveDir = Vector2.right;
     private BTNode topNode;
 
-    // --- IThiefController implementation ---
     public Transform SelfTransform => transform;
     public Transform Police => police;
     public Transform ExitTarget => exitTarget;
@@ -82,7 +81,6 @@ public class BTThiefWithCash : MonoBehaviour, ThiefCashController
 
         return bestDir.normalized;
     }
-    // --- End IThiefController ---
 
     private void Start()
     {
@@ -97,15 +95,12 @@ public class BTThiefWithCash : MonoBehaviour, ThiefCashController
 
     private void ConstructBehaviourTree()
     {
-        // Shared nodes — menerima IThiefController, bukan class konkret
         var policeVisible = new PoliceVisibleNode(this, fleeRange);
         var exitNearby = new ExitNearbyNode(this, detectionRange);
         var fleeNode = new FleeNode(this);
         var escapeNode = new EscapeNode(this);
         var wanderNode = new WanderNode(this);
 
-        // Cash-specific nodes — menerima BTThiefWithCash langsung (wajar,
-        // karena node ini memang spesifik untuk thief jenis ini)
         var hasAllCash = new HasMoneyNode(this);
         var cashNearby = new MoneyNearbyNode(this);
         var collectCash = new CollectMoneyNode(this);
