@@ -5,6 +5,8 @@ public class HearingSensor : MonoBehaviour
 {
     [Header("Hearing Settings")]
     public float radius = 6f;
+    public float memoryDuration = 1f; // tetap "heard" selama X detik setelah noise terakhir terdeteksi
+    private float lastHeardTime = -999f;
 
     [Header("Detection")]
     public Transform targetGO;
@@ -12,8 +14,14 @@ public class HearingSensor : MonoBehaviour
 
     public bool targetHeard;
 
+    [Header("Buffer")]
+    [Tooltip("Ukuran buffer OverlapCircleNonAlloc, sesuaikan dengan estimasi maksimum noise signal aktif bersamaan")]
+    public int maxDetections = 8;
+    private Collider2D[] hitBuffer;
+
     private void Start()
     {
+        hitBuffer = new Collider2D[maxDetections];
         StartCoroutine(SensoryRoutine());
     }
 
@@ -26,22 +34,32 @@ public class HearingSensor : MonoBehaviour
             SensorCheck();
         }
     }
-
     private void SensorCheck()
     {
-        // Hearing: tidak butuh FOV, tidak butuh line-of-sight.
-        // Cukup cek apakah target berada dalam radius dengar.
-        Collider2D[] rangeChecks =
-            Physics2D.OverlapCircleAll(transform.position, radius, targetMask);
+        ContactFilter2D filter = new ContactFilter2D();
+        filter.SetLayerMask(targetMask);
+        filter.useLayerMask = true;
+        filter.useTriggers = true;
 
-        if (rangeChecks.Length != 0)
+        int count = Physics2D.OverlapCircle(transform.position, radius, filter, hitBuffer);
+
+        if (count > 0)
         {
-            targetGO = rangeChecks[0].transform;
-            targetHeard = true;
+            Transform nearest = null;
+            float nearestDist = float.MaxValue;
+            for (int i = 0; i < count; i++)
+            {
+                float dist = Vector2.Distance(transform.position, hitBuffer[i].transform.position);
+                if (dist < nearestDist)
+                {
+                    nearestDist = dist;
+                    nearest = hitBuffer[i].transform;
+                }
+            }
+            targetGO = nearest;
+            lastHeardTime = Time.time;
         }
-        else
-        {
-            targetHeard = false;
-        }
+
+        targetHeard = (Time.time - lastHeardTime) <= memoryDuration;
     }
 }

@@ -2695,11 +2695,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   radius: 1.5
+  memoryDuration: 1
   targetGO: {fileID: 0}
   targetMask:
     serializedVersion: 2
     m_Bits: 128
   targetHeard: 0
+  maxDetections: 8
 --- !u!1 &519420028
 GameObject:
   m_ObjectHideFlags: 0
@@ -5602,11 +5604,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   radius: 1.5
+  memoryDuration: 1
   targetGO: {fileID: 0}
   targetMask:
     serializedVersion: 2
     m_Bits: 128
   targetHeard: 0
+  maxDetections: 8
 --- !u!114 &1106609658
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5915,6 +5919,7 @@ GameObject:
   - component: {fileID: 1114201123}
   - component: {fileID: 1114201122}
   - component: {fileID: 1114201125}
+  - component: {fileID: 1114201126}
   m_Layer: 7
   m_Name: Player
   m_TagString: Player
@@ -6111,6 +6116,23 @@ MonoBehaviour:
   m_DefaultActionMap: 
   m_SplitScreenIndex: -1
   m_Camera: {fileID: 0}
+--- !u!114 &1114201126
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1114201119}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f2d55548ddb7b8c4fbbe38d383d8af74, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  noiseSignalPrefab: {fileID: 3619610931460525949, guid: 74449355cf1e2b442a7d3a26f039cdb2, type: 3}
+  walkEmitInterval: 0.5
+  sprintEmitInterval: 0.2
+  moveSpeedThreshold: 0.1
+  sprintSpeedThreshold: 4
 --- !u!1 &1118657935
 GameObject:
   m_ObjectHideFlags: 0
@@ -6263,7 +6285,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!212 &1143472372
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -6410,7 +6432,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!212 &1164030271
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -8149,7 +8171,7 @@ Transform:
   m_GameObject: {fileID: 1429331034}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 1.71, y: -4.49, z: 0}
+  m_LocalPosition: {x: 3.2, y: -3.7, z: 0}
   m_LocalScale: {x: 1.5, y: 1.5, z: 1.5}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -8258,17 +8280,19 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1429331034}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 77d966493c90d6e40a444501287ccba5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  radius: 1.5
+  radius: 2
+  memoryDuration: 1
   targetGO: {fileID: 0}
   targetMask:
     serializedVersion: 2
-    m_Bits: 128
+    m_Bits: 256
   targetHeard: 0
+  maxDetections: 8
 --- !u!114 &1429331042
 MonoBehaviour:
   m_ObjectHideFlags: 0
