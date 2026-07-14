@@ -162,8 +162,19 @@ public class BTThiefWithCash : MonoBehaviour, ThiefCashController
         {
             if (cash == null) continue;
 
-            float dist = Vector2.Distance(transform.position, cash.transform.position);
+            Vector2 toCash = (Vector2)cash.transform.position - (Vector2)transform.position;
+            float dist = toCash.magnitude;
             if (dist > cashDetecRange) continue;
+
+            if (sightSensor != null)
+            {
+                float angleToTarget = Vector2.Angle(lastMoveDir, toCash.normalized);
+                if (angleToTarget > sightSensor.angle / 2f) continue;
+
+                RaycastHit2D hit = Physics2D.Raycast(
+                    transform.position, toCash.normalized, dist, sightSensor.obstacleMask);
+                if (hit.collider != null) continue;
+            }
 
             List<Node> testPath = pathfinding.FindPath(
                 transform.position, cash.transform.position);

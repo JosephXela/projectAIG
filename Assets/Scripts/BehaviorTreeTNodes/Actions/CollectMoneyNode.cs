@@ -4,6 +4,7 @@ using UnityEngine;
 public class CollectMoneyNode : BTNode
 {
     private ThiefCashController thief;
+    private Transform trackedCashTarget; // cash yang sedang di-tuju oleh path saat ini
 
     public CollectMoneyNode(ThiefCashController thief)
     {
@@ -17,6 +18,7 @@ public class CollectMoneyNode : BTNode
         {
             thief.CurrentPath = null;
             thief.PathIndex = 0;
+            trackedCashTarget = null;
             return NodeState.FAILURE;
         }
 
@@ -24,6 +26,13 @@ public class CollectMoneyNode : BTNode
             thief.CurrentPath == null ||
             thief.CurrentPath.Count == 0 ||
             thief.PathIndex >= thief.CurrentPath.Count;
+
+        // Path dianggap invalid juga kalau cash target berubah
+        // (misal sebelumnya path menuju wander point, atau cash lain)
+        if (!pathInvalid && trackedCashTarget != thief.CashTarget)
+        {
+            pathInvalid = true;
+        }
 
         if (pathInvalid)
         {
@@ -36,6 +45,7 @@ public class CollectMoneyNode : BTNode
 
             thief.CurrentPath = newPath;
             thief.PathIndex = 0;
+            trackedCashTarget = thief.CashTarget;
         }
 
         return NodeState.RUNNING;
